@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from utils import get_password_hash, verify_password
 import models
 import schemas
+from models import Client
+from sqlalchemy.exc import NoResultFound
+from typing import Tuple, List
 
 
 def authenticate_user(db, username: str, password: str):
@@ -37,3 +40,43 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_clients_by_name(
+    db: Session, name: str, page: int, page_size: int
+) -> Tuple[List[Client], int]:
+    """
+    根据名字分页查询客户信息。
+
+    :param name: 客户名字
+    :param page: 页码，从1开始
+    :param page_size: 每页大小
+    :return: (客户列表, 总客户数)
+    """
+    try:
+        # 计算跳过的记录数
+        offset = (page - 1) * page_size
+
+        # 查询总数
+        total = db.query(Client).filter(Client.name == name).count()
+
+        # 分页查询
+        clients = (
+            db.query(Client)
+            .filter(Client.name == name)
+            .order_by(Client.id)
+            .offset(offset)
+            .limit(page_size)
+            .options(
+                joinedload(Client.babies),
+                joinedload(Client.meal_plan),
+                joinedload(Client.recovery_plan),
+            )
+            .all()
+        )
+
+        return clients, total
+    except NoResultFound:
+        return [], 0
+    finally:
+        db.close()

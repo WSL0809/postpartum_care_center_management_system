@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
-from fastapi import Depends, FastAPI, HTTPException, status, Security
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 import crud
 import utils
 from schemas import UserCreate, User, TokenData
+from schema import ClientList
 import models
 from database import engine, SessionLocal
 from utils import verify_password
@@ -111,6 +112,17 @@ async def get_users(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+@app.get("/clients/", response_model=ClientList)
+async def read_clients(
+    name: str, 
+    last_id: int = 0, 
+    page_size: int = 10, 
+    db: Session = Depends(get_db)
+):
+    clients = crud.get_clients_by_name_with_cursor_pagination(db, name, last_id, page_size)
+    total = crud.get_clients_total(db, name)  # 假设这个函数返回特定名称的客户总数
+    return {"clients": clients, "total": total}
 
 
 @app.get("/hello")
