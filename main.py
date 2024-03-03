@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 import crud
 import utils
 from schemas import UserCreate, User, TokenData
-from schema import ClientList
+from db import ClientList
 import models
 from database import engine, SessionLocal
 from utils import verify_password
