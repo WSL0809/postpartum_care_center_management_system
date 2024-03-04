@@ -14,8 +14,8 @@ class ClientBase(BaseModel):
     contact_name: str
     contact_tel: str
     babies: List[Baby]
-    meal_plan: int
-    recovery_plan: Optional[int] = None
+    meal_plan_id: int
+    recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
     assigned_baby_nurse: int
 

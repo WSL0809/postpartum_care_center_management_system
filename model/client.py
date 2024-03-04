@@ -19,6 +19,7 @@ class Client(Base):
     hospital_for_childbirth = Column(String(255), nullable=False)
     contact_name = Column(String(255), nullable=False)
     contact_tel = Column(String(255), nullable=False)
+    mode_of_delivery = Column(String(255), nullable=False)
 
 class Baby(Base):
     __tablename__ = "baby"

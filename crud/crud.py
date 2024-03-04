@@ -48,8 +48,8 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 def create_client(db: Session, client: schema.ClientCreate):
     db_client = model.Client(
-        meal_plan_id=client.meal_plan,
-        recovery_plan_id=client.recovery_plan,
+        meal_plan_id=client.meal_plan_id,
+        recovery_plan_id=client.recovery_plan_id,
         assigned_baby_nurse=client.assigned_baby_nurse,
         name=client.name,
         tel=client.tel,
@@ -58,7 +58,8 @@ def create_client(db: Session, client: schema.ClientCreate):
         check_in_date=client.check_in_date,
         hospital_for_childbirth=client.hospital_for_childbirth,
         contact_name=client.contact_name,
-        contact_tel=client.contact_tel
+        contact_tel=client.contact_tel,
+        mode_of_delivery=client.mode_of_delivery
     )
     db.add(db_client)
     db.commit()
@@ -82,9 +83,45 @@ def create_client(db: Session, client: schema.ClientCreate):
         db.add(db_baby)
 
     db.commit()
-    get_client_and_babies(db, db_client.id)
+    return get_client_and_babies(db, db_client.id)
 
 
+# def get_client_and_babies(db: Session, client_id: int):
+#     # 定义联表查询
+#     stmt = select(Client, Baby).join(Baby, Client.id == Baby.client_id).where(Client.id == client_id)
+#
+#     # 执行查询
+#     result = db.execute(stmt)
+#
+#     # 处理结果
+#     client_babies_data = result.fetchall()
+#     clients_dict = {}
+#     client_response = ClientBase()
+#     # 遍历查询结果
+#     for row in client_babies_data:
+#         # 假设每个行的结构是 (Client, Baby)
+#         client, baby = row
+#
+#         # 检查客户是否已经在字典中
+#         if client.id not in clients_dict:
+#             # 如果不在，添加客户信息和一个空的宝宝列表
+#             clients_dict[client.id] = {
+#                 "client_info": {
+#                     "name": client.name,
+#                     "tel": client.tel,
+#                     # 添加更多需要的客户信息...
+#                 },
+#                 "babies": []
+#             }
+#
+#         # 向客户的宝宝列表添加宝宝信息
+#         clients_dict[client.id]["babies"].append({
+#             "name": baby.name,
+#             "birth_date": baby.birth_date,
+#             # 添加更多需要的宝宝信息...
+#         })
+#
+#     print(clients_dict)
 
 def get_client_and_babies(db: Session, client_id: int):
     # 定义联表查询
@@ -95,33 +132,46 @@ def get_client_and_babies(db: Session, client_id: int):
 
     # 处理结果
     client_babies_data = result.fetchall()
-    clients_dict = {}
+    # 假设我们只处理一个客户（因为我们通过客户ID查询）
+    client_response = None
 
     # 遍历查询结果
     for row in client_babies_data:
-        # 假设每个行的结构是 (Client, Baby)
-        client, baby = row
+        client, baby = row  # 假设每行结构是 (Client, Baby)
+        if client_response is None:
+            # 初始化ClientBase实例
+            client_response = ClientBase(
+                name=client.name,
+                tel=client.tel,
+                age=client.age,  # 假设这些字段存在
+                scheduled_date=client.scheduled_date,
+                check_in_date=client.check_in_date,
+                hospital_for_childbirth=client.hospital_for_childbirth,
+                contact_name=client.contact_name,
+                contact_tel=client.contact_tel,
+                babies=[],
+                meal_plan=client.meal_plan_id,
+                recovery_plan=client.recovery_plan_id,
+                mode_of_delivery=client.mode_of_delivery,
+                assigned_baby_nurse=client.assigned_baby_nurse
+            )
 
-        # 检查客户是否已经在字典中
-        if client.id not in clients_dict:
-            # 如果不在，添加客户信息和一个空的宝宝列表
-            clients_dict[client.id] = {
-                "client_info": {
-                    "name": client.name,
-                    "tel": client.tel,
-                    # 添加更多需要的客户信息...
-                },
-                "babies": []
-            }
+        # 向ClientBase实例的babies列表添加Baby实例
+        client_response.babies.append(Baby(
+            name=baby.name,
+            gender=baby.gender,
+            birth_date=baby.birth_date,
+            birth_weight=baby.birth_weight,
+            birth_height=baby.birth_height,
+            health_status=baby.health_status,
+            birth_certificate=baby.birth_certificate,
+            remarks=baby.remarks,
+            mom_id_number=baby.mom_id_number,
+            dad_id_number=baby.dad_id_number,
+            summary=baby.summary))
 
-        # 向客户的宝宝列表添加宝宝信息
-        clients_dict[client.id]["babies"].append({
-            "name": baby.name,
-            "birth_date": baby.birth_date,
-            # 添加更多需要的宝宝信息...
-        })
+    return client_response
 
-    print(clients_dict )
 def get_clients_by_name(
         db: Session, name: str, page: int, page_size: int
 ) -> Tuple[List[Client], int]:

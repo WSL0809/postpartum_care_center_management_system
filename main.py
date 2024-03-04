@@ -121,7 +121,7 @@ async def get_users(
 #     return {"clients": clients, "total": total}
 
 
-@app.post("/create_client/")
+@app.post("/create_client/", response_model=ClientBase)
 async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
     return crud.create_client(db, client)
 
