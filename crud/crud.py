@@ -3,12 +3,28 @@ from sqlalchemy.orm import Session, joinedload
 
 import schema
 from schema import ClientBase, ClientCreate
+from schema.client import client_to_client_base, baby_to_baby_base
 from utils import get_password_hash, verify_password
 import model
 import schemas
 from model import Client, Baby
-from sqlalchemy.exc import NoResultFound
-from typing import Tuple, List
+from sqlalchemy.exc import NoResultFound, SQLAlchemyError
+from typing import Tuple, List, Optional
+from functools import wraps
+
+
+def handle_db_exceptions(func):
+    """数据库操作异常处理装饰器"""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except SQLAlchemyError as e:
+            print(f"Database error occurred: {e}")
+            return None  # 或返回适当的错误响应
+
+    return wrapper
 
 
 def authenticate_user(db, username: str, password: str):
@@ -150,8 +166,8 @@ def get_client_and_babies(db: Session, client_id: int):
                 contact_name=client.contact_name,
                 contact_tel=client.contact_tel,
                 babies=[],
-                meal_plan=client.meal_plan_id,
-                recovery_plan=client.recovery_plan_id,
+                meal_plan_id=client.meal_plan_id,
+                recovery_plan_id=client.recovery_plan_id,
                 mode_of_delivery=client.mode_of_delivery,
                 assigned_baby_nurse=client.assigned_baby_nurse
             )
@@ -172,41 +188,59 @@ def get_client_and_babies(db: Session, client_id: int):
 
     return client_response
 
-def get_clients_by_name(
-        db: Session, name: str, page: int, page_size: int
-) -> Tuple[List[Client], int]:
-    """
-    根据名字分页查询客户信息。
 
-    :param name: 客户名字
-    :param page: 页码，从1开始
-    :param page_size: 每页大小
-    :return: (客户列表, 总客户数)
-    """
-    try:
-        # 计算跳过的记录数
-        offset = (page - 1) * page_size
+@handle_db_exceptions
+def query_client_by_name(db: Session, client_name: str):
+    """根据客户名查询客户及其宝宝信息"""
+    stmt = (
+        select(Client)
+        .options(joinedload(Client.babies))
+        .where(Client.name == client_name)
+    )
+    return db.execute(stmt).scalars().first()
 
-        # 查询总数
-        total = db.query(Client).filter(Client.name == name).count()
 
-        # 分页查询
-        clients = (
-            db.query(Client)
-            .filter(Client.name == name)
+@handle_db_exceptions
+def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page: int, page_size: int):
+    # 计算分页的偏移量
+    offset = (page - 1) * page_size
+
+    # 如果client_name为None，就不应用过滤条件
+    if client_name is not None:
+        stmt = (
+            select(Client, Baby)
+            .join(Baby, Client.id == Baby.client_id)
+            .where(Client.name == client_name)
             .order_by(Client.id)
             .offset(offset)
             .limit(page_size)
-            .options(
-                joinedload(Client.babies),
-                joinedload(Client.meal_plan),
-                joinedload(Client.recovery_plan),
-            )
-            .all()
+        )
+    else:
+        # client_name为None时，查询所有Client及其Baby信息
+        stmt = (
+            select(Client, Baby)
+            .join(Baby, Client.id == Baby.client_id)
+            .order_by(Client.id)
+            .offset(offset)
+            .limit(page_size)
         )
 
-        return clients, total
-    except NoResultFound:
-        return [], 0
-    finally:
-        db.close()
+    # 执行查询
+    result = db.execute(stmt).fetchall()
+
+    # 用于收集客户及其宝宝信息的字典
+    clients_data = {}
+
+    # 遍历查询结果
+    for client, baby in result:
+        # 如果这个客户还没有被添加到字典中，就初始化它
+        if client.id not in clients_data:
+            clients_data[client.id] = client_to_client_base(client)
+            clients_data[client.id].babies = []
+
+        # 向对应的Client实例添加Baby信息
+        clients_data[client.id].babies.append(baby_to_baby_base(baby))
+
+    # 返回处理后的客户列表
+    return list(clients_data.values())
+

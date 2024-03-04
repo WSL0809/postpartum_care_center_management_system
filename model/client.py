@@ -21,6 +21,8 @@ class Client(Base):
     contact_tel = Column(String(255), nullable=False)
     mode_of_delivery = Column(String(255), nullable=False)
 
+    babies = relationship("Baby", back_populates="client")
+
 class Baby(Base):
     __tablename__ = "baby"
 
@@ -37,6 +39,8 @@ class Baby(Base):
     mom_id_number = Column(Text, nullable=False)
     dad_id_number = Column(Text, nullable=False)
     summary = Column(String(255), nullable=False)
+
+    client = relationship("Client", back_populates="babies")
 
 class ClientBabyNurse(Base):
     __tablename__ = "client_baby_nurse"
