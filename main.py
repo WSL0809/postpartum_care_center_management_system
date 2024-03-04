@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 
 import crud
 import utils
+from schema import ClientBase, ClientCreate
 from schemas import UserCreate, User, TokenData
-from db import ClientList
 import models
 from database import engine, SessionLocal
 from utils import verify_password
@@ -113,16 +113,17 @@ async def get_users(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-@app.get("/clients/", response_model=ClientList)
-async def read_clients(
-    name: str, 
-    last_id: int = 0, 
-    page_size: int = 10, 
-    db: Session = Depends(get_db)
-):
-    clients = crud.get_clients_by_name_with_cursor_pagination(db, name, last_id, page_size)
-    total = crud.get_clients_total(db, name)  # 假设这个函数返回特定名称的客户总数
-    return {"clients": clients, "total": total}
+
+# @app.get("/clients/", response_model=ClientList)
+# async def read_clients(db: Session = Depends(get_db)):
+#     clients = crud.get_clients_by_name_with_cursor_pagination(db, name, last_id, page_size)
+#     total = crud.get_clients_total(db, name)  # 假设这个函数返回特定名称的客户总数
+#     return {"clients": clients, "total": total}
+
+
+@app.post("/create_client/")
+async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
+    return crud.create_client(db, client)
 
 
 @app.get("/hello")

@@ -1,24 +1,32 @@
-from pydantic import BaseModel, date
-from typing import List
+from pydantic import BaseModel
+from datetime import date
+from typing import List, Optional
+from .baby import Baby
+
 
 class ClientBase(BaseModel):
-    id: int
     name: str
     tel: str
     age: int
-    scheduled_date: date
-    check_in_date: date
+    scheduled_date: str
+    check_in_date: str
     hospital_for_childbirth: str
     contact_name: str
     contact_tel: str
-    summary: str
-    babies: str
-    meal_plan: str
-    recovery_plan: str
+    babies: List[Baby]
+    meal_plan: int
+    recovery_plan: Optional[int] = None
+    mode_of_delivery: str
+    assigned_baby_nurse: int
+
+
+class ClientCreate(ClientBase):
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 class ClientList(BaseModel):
     clients: List[ClientBase]
     total: int
-
-
