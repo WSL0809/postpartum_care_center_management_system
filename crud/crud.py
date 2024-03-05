@@ -1,9 +1,9 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload
 
 import schema
 from schema import ClientBase, ClientCreate
-from schema.client import client_to_client_base, baby_to_baby_base
+from schema.client import client_to_client_base, baby_to_baby_base, ClientList
 from utils import get_password_hash, verify_password
 import model
 import schemas
@@ -200,47 +200,102 @@ def query_client_by_name(db: Session, client_name: str):
     return db.execute(stmt).scalars().first()
 
 
+# @handle_db_exceptions
+# def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page: int, page_size: int):
+#     # 计算分页的偏移量
+#     offset = (page - 1) * page_size
+#
+#     # 如果client_name为None，就不应用过滤条件
+#     if client_name is not None:
+#         stmt = (
+#             select(Client, Baby)
+#             .join(Baby, Client.id == Baby.client_id)
+#             .where(Client.name == client_name)
+#             .order_by(Client.id)
+#             .offset(offset)
+#             .limit(page_size)
+#         )
+#     else:
+#         # client_name为None时，查询所有Client及其Baby信息
+#         stmt = (
+#             select(Client, Baby)
+#             .join(Baby, Client.id == Baby.client_id)
+#             .order_by(Client.id)
+#             .offset(offset)
+#             .limit(page_size)
+#         )
+#
+#     # 执行查询
+#     result = db.execute(stmt).fetchall()
+#
+#     # 用于收集客户及其宝宝信息的字典
+#     clients_data = {}
+#
+#     # 遍历查询结果
+#     for client, baby in result:
+#         # 如果这个客户还没有被添加到字典中，就初始化它
+#         if client.id not in clients_data:
+#             clients_data[client.id] = client_to_client_base(client)
+#             clients_data[client.id].babies = []
+#
+#         # 向对应的Client实例添加Baby信息
+#         clients_data[client.id].babies.append(baby_to_baby_base(baby))
+#
+#     # 返回处理后的客户列表
+#     return list(clients_data.values())
+
+from typing import Optional
+from sqlalchemy.orm import Session
+from sqlalchemy import select, func
+
+
 @handle_db_exceptions
 def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page: int, page_size: int):
     # 计算分页的偏移量
     offset = (page - 1) * page_size
 
-    # 如果client_name为None，就不应用过滤条件
-    if client_name is not None:
-        stmt = (
-            select(Client, Baby)
-            .join(Baby, Client.id == Baby.client_id)
-            .where(Client.name == client_name)
-            .order_by(Client.id)
-            .offset(offset)
-            .limit(page_size)
-        )
-    else:
-        # client_name为None时，查询所有Client及其Baby信息
-        stmt = (
-            select(Client, Baby)
-            .join(Baby, Client.id == Baby.client_id)
-            .order_by(Client.id)
-            .offset(offset)
-            .limit(page_size)
-        )
+    # 定义查询基础
+    base_query = select(Client, Baby).join(Baby, Client.id == Baby.client_id)
 
-    # 执行查询
-    result = db.execute(stmt).fetchall()
+    # 如果client_name不为None，应用过滤条件
+    if client_name is not None:
+        base_query = base_query.where(Client.name == client_name)
+
+    # 对查询结果进行排序
+    sorted_query = base_query.order_by(Client.id)
+
+    # 应用分页
+    paginated_query = sorted_query.offset(offset).limit(page_size)
+
+    # 执行查询，获取当前页的数据
+    result = db.execute(paginated_query).fetchall()
+
+    # 获取满足条件的总记录数
+    total_records = db.execute(select(func.count()).select_from(sorted_query.subquery())).scalar()
+
+    # 计算总页数
+    total_pages = (total_records + page_size - 1) // page_size
 
     # 用于收集客户及其宝宝信息的字典
     clients_data = {}
 
     # 遍历查询结果
     for client, baby in result:
-        # 如果这个客户还没有被添加到字典中，就初始化它
         if client.id not in clients_data:
             clients_data[client.id] = client_to_client_base(client)
             clients_data[client.id].babies = []
-
-        # 向对应的Client实例添加Baby信息
         clients_data[client.id].babies.append(baby_to_baby_base(baby))
 
-    # 返回处理后的客户列表
-    return list(clients_data.values())
+    # 构建返回的数据，包括客户数据和分页信息
+    return_data = {
+        "clients": list(clients_data.values()),
+        "pagination": {
+            "totalRecords": total_records,
+            "totalPages": total_pages,
+            "currentPage": page,
+            "pageSize": page_size
+        }
+    }
 
+    # 返回包含客户数据和分页信息的字典
+    return return_data

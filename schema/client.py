@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List, Optional
+from typing import List, Optional, Dict
 from .baby import Baby
 
 
@@ -28,7 +28,7 @@ class ClientCreate(ClientBase):
 
 class ClientList(BaseModel):
     clients: List[ClientBase]
-    total: int
+    pagination: Dict
 
 
 def client_to_client_base(client):
