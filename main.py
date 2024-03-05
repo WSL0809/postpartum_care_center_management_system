@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 import crud
 import utils
 from schema import ClientBase, ClientCreate, ClientList
-from schemas import UserCreate, User, TokenData
+from auth_schema import UserCreate, User, TokenData
 import models
 from database import engine, SessionLocal
 from utils import verify_password
@@ -125,7 +125,7 @@ async def get_clients(page: int = Query(default=1, alias="page"),
     return clients
 
 
-@app.post("/create_client/", response_model=ClientList)
+@app.post("/create_client/", response_model=ClientBase)
 async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
     return crud.create_client(db, client)
 

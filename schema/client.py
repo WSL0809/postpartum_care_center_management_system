@@ -42,7 +42,7 @@ def client_to_client_base(client):
         hospital_for_childbirth=client.hospital_for_childbirth,
         contact_name=client.contact_name,
         contact_tel=client.contact_tel,
-        babies=[baby_to_baby_base(baby) for baby in client.babies],  # 使用列表推导式转换所有宝宝实体
+        babies=[baby_to_baby_base(baby) for baby in client.babies],
         meal_plan_id=client.meal_plan_id,
         recovery_plan_id=client.recovery_plan_id,
         mode_of_delivery=client.mode_of_delivery,
