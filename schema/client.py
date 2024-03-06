@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import date
 from typing import List, Optional, Dict
 from .baby import Baby
 
