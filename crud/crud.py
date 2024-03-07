@@ -75,7 +75,8 @@ def create_client(db: Session, client: schema.ClientCreate):
         hospital_for_childbirth=client.hospital_for_childbirth,
         contact_name=client.contact_name,
         contact_tel=client.contact_tel,
-        mode_of_delivery=client.mode_of_delivery
+        mode_of_delivery=client.mode_of_delivery,
+        room=client.room
     )
     db.add(db_client)
     db.commit()

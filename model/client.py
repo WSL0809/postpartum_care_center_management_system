@@ -20,6 +20,7 @@ class Client(Base):
     contact_name = Column(String(255), nullable=False)
     contact_tel = Column(String(255), nullable=False)
     mode_of_delivery = Column(String(255), nullable=False)
+    room = Column(String(255), ForeignKey("room.room_number"))
 
     babies = relationship("Baby", back_populates="client")
 

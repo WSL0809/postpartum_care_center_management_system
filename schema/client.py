@@ -17,6 +17,7 @@ class ClientBase(BaseModel):
     recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
     assigned_baby_nurse: int
+    room: str
 
 
 class ClientCreate(ClientBase):
@@ -45,7 +46,8 @@ def client_to_client_base(client):
         meal_plan_id=client.meal_plan_id,
         recovery_plan_id=client.recovery_plan_id,
         mode_of_delivery=client.mode_of_delivery,
-        assigned_baby_nurse=client.assigned_baby_nurse
+        assigned_baby_nurse=client.assigned_baby_nurse,
+        room=client.room
     )
 
 

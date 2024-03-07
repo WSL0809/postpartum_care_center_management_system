@@ -63,3 +63,14 @@ CREATE TABLE Baby (
 	dad_id_number TEXT NOT NULL,
 	FOREIGN KEY ( client_id ) REFERENCES Client ( id )
 );
+
+create table room
+(
+    id            INTEGER      not null
+        primary key,
+    status        VARCHAR(255) not null,
+    client_id     INTEGER      not null
+        references client,
+    recently_used VARCHAR(255),
+    notes         VARCHAR(255)
+);

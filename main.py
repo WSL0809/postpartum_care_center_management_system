@@ -132,8 +132,9 @@ async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
 
 @app.get("/get_room_by_id")
 async def get_rooms(db: Session = Depends(get_db), room_id: int = Query(default=None, alias="room_id")):
+    # 获取 room join client
     return crud.get_room_by_id(db, room_id)
-
+    #
 
 @app.get("/hello")
 async def hello():
