@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from .baby import Baby
+from .plan import MealPlanModel, RecoveryPlanModel
+from .base import BabyNurseModel
 
 
 class ClientBase(BaseModel):
@@ -31,6 +33,27 @@ class ClientList(BaseModel):
     pagination: Dict
 
 
+class ClientModel(BaseModel):
+    id: int
+    name: str
+    tel: str
+    age: int
+    scheduled_date: str
+    check_in_date: str
+    hospital_for_childbirth: str
+    contact_name: str
+    contact_tel: str
+    mode_of_delivery: str
+    room: Optional[str] = None
+    meal_plan: Optional[MealPlanModel] = None
+    recovery_plan: Optional[RecoveryPlanModel] = None
+    assigned_baby_nurse: Optional[BabyNurseModel] = None
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
 def client_to_client_base(client):
     """将 Client 实体转换为 ClientBase 响应模型"""
     return ClientBase(
@@ -47,7 +70,7 @@ def client_to_client_base(client):
         recovery_plan_id=client.recovery_plan_id,
         mode_of_delivery=client.mode_of_delivery,
         assigned_baby_nurse=client.assigned_baby_nurse,
-        room=client.room
+        room=client.room,
     )
 
 
@@ -64,5 +87,5 @@ def baby_to_baby_base(baby):
         remarks=baby.remarks,
         mom_id_number=baby.mom_id_number,
         dad_id_number=baby.dad_id_number,
-        summary=baby.summary
+        summary=baby.summary,
     )

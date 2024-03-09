@@ -76,7 +76,7 @@ def create_client(db: Session, client: schema.ClientCreate):
         contact_name=client.contact_name,
         contact_tel=client.contact_tel,
         mode_of_delivery=client.mode_of_delivery,
-        room=client.room
+        room=client.room,
     )
     db.add(db_client)
     db.commit()
@@ -94,8 +94,7 @@ def create_client(db: Session, client: schema.ClientCreate):
             remarks=baby.remarks,
             mom_id_number=baby.mom_id_number,
             dad_id_number=baby.dad_id_number,
-            summary=baby.summary
-
+            summary=baby.summary,
         )
         db.add(db_baby)
 
@@ -105,7 +104,11 @@ def create_client(db: Session, client: schema.ClientCreate):
 
 def get_client_and_babies(db: Session, client_id: int):
     # 定义联表查询
-    stmt = select(Client, Baby).join(Baby, Client.id == Baby.client_id).where(Client.id == client_id)
+    stmt = (
+        select(Client, Baby)
+        .join(Baby, Client.id == Baby.client_id)
+        .where(Client.id == client_id)
+    )
 
     # 执行查询
     result = db.execute(stmt)
@@ -129,7 +132,9 @@ def get_client_and_babies(db: Session, client_id: int):
 
 
 @handle_db_exceptions
-def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page: int, page_size: int) -> ClientList:
+def get_clients_and_babies_by_name(
+    db: Session, client_name: Optional[str], page: int, page_size: int
+) -> ClientList:
     # 计算分页的偏移量
     offset = (page - 1) * page_size
 
@@ -150,7 +155,9 @@ def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page
     result = db.execute(paginated_query).fetchall()
 
     # 获取满足条件的总记录数
-    total_records = db.execute(select(func.count()).select_from(sorted_query.subquery())).scalar()
+    total_records = db.execute(
+        select(func.count()).select_from(sorted_query.subquery())
+    ).scalar()
 
     # 计算总页数
     total_pages = (total_records + page_size - 1) // page_size
@@ -170,8 +177,8 @@ def get_clients_and_babies_by_name(db: Session, client_name: Optional[str], page
             "totalRecords": total_records,
             "totalPages": total_pages,
             "currentPage": page,
-            "pageSize": page_size
-        }
+            "pageSize": page_size,
+        },
     }
 
     # 返回包含客户数据和分页信息的字典

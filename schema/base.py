@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -11,7 +13,11 @@ class BabyNurse(BaseModel):
     photo: str
 
 
-class Plan(BaseModel):
-    meal_plan_id: int
-    details: str
-    duration: str
+class BabyNurseModel(BaseModel):
+    baby_nurse_id: Optional[int] = None
+    name: Optional[str] = None
+    age: Optional[str] = None
+    tel: Optional[str] = None
+    address: Optional[str] = None
+    id_number: Optional[str] = None
+    photo: Optional[str] = None

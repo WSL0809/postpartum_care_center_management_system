@@ -20,9 +20,15 @@ class Client(Base):
     contact_name = Column(String(255), nullable=False)
     contact_tel = Column(String(255), nullable=False)
     mode_of_delivery = Column(String(255), nullable=False)
-    room = Column(String(255), ForeignKey("room.room_number"))
+    room = Column(String(255), ForeignKey("room.room_number"), unique=True)
 
     babies = relationship("Baby", back_populates="client")
+
+
+class RemovedClient(Client):
+    __tablename__ = "removed_client"
+    status = Column(String(255), nullable=False)
+
 
 class Baby(Base):
     __tablename__ = "baby"
@@ -43,6 +49,7 @@ class Baby(Base):
 
     client = relationship("Client", back_populates="babies")
 
+
 class ClientBabyNurse(Base):
     __tablename__ = "client_baby_nurse"
 
@@ -52,6 +59,8 @@ class ClientBabyNurse(Base):
     start_date = Column(String(255), nullable=False)
     end_date = Column(String(255), nullable=False)
     status = Column(String(255), nullable=False)
+
+
 class BabyNurse(Base):
     __tablename__ = "baby_nurse"
 

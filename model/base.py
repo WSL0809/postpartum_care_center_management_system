@@ -2,6 +2,7 @@ from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String, Text, Date,
 
 from database import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -11,4 +12,3 @@ class User(Base):
     role = Column(String, default="admin")
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-
