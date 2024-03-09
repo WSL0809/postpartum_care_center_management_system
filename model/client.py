@@ -25,8 +25,23 @@ class Client(Base):
     babies = relationship("Baby", back_populates="client")
 
 
-class RemovedClient(Client):
+class RemovedClient(Base):
     __tablename__ = "removed_client"
+
+    id = Column(Integer, primary_key=True)
+    meal_plan_id = Column(Integer)
+    recovery_plan_id = Column(Integer)
+    assigned_baby_nurse = Column(Integer)
+    name = Column(String(255), nullable=False)
+    tel = Column(String(255), nullable=False)
+    age = Column(Integer, nullable=False)
+    scheduled_date = Column(String(255), nullable=False)
+    check_in_date = Column(String(255), nullable=False)
+    hospital_for_childbirth = Column(String(255), nullable=False)
+    contact_name = Column(String(255), nullable=False)
+    contact_tel = Column(String(255), nullable=False)
+    mode_of_delivery = Column(String(255), nullable=False)
+    room = Column(String(255), ForeignKey("room.room_number"), unique=True)
     status = Column(String(255), nullable=False)
 
 
