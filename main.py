@@ -16,11 +16,13 @@ from database import engine, SessionLocal
 from utils import verify_password
 from crud import create_user, get_user, get_clients_and_babies_by_name
 from schema import RoomModel
+from api import change_room_router, reserve_router
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
+app.include_router(change_room_router)
+app.include_router(reserve_router)
 
 # Dependency
 def get_db():
@@ -150,20 +152,24 @@ async def get_all_rooms_info(db: Session = Depends(get_db)):
 
 
 @app.post("/set_room_client")
-async def set_room_client(client: schema.room.RoomClientModel, db: Session = Depends(get_db)):
+async def set_room_client(
+    client: schema.room.RoomClientModel, db: Session = Depends(get_db)
+):
     return crud.set_room_client(db, client)
-
 
 
 @app.post("/check_out")
 async def check_out(client: ClientCreate, db: Session = Depends(get_db)):
     return crud.set_room_client(db, client)
+
+
 # @app.post("/book")
 # async def check_in(client: ClientCreate, db: Session = Depends(get_db)):
 #     return crud.set_room(db, client, "booked")
 # @app.post("/repair")
 # async def check_in(client: ClientCreate, db: Session = Depends(get_db)):
 #     return crud.set_room(db, client, "under_maintenance")
+
 
 @app.get("/hello")
 async def hello():

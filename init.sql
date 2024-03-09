@@ -15,3 +15,90 @@ INSERT INTO baby_nurse (baby_nurse_id, name, age, tel, address, id_number, photo
 INSERT INTO baby_nurse (baby_nurse_id, name, age, tel, address, id_number, photo) VALUES (3, 'Sarah Brown', 35, '555-9012', '789 Pine St, Yourtown', 'ID23456789', 'photo_url_3');
 INSERT INTO baby_nurse (baby_nurse_id, name, age, tel, address, id_number, photo) VALUES (4, 'Fiona Smith', 29, '555-3456', '321 Elm St, Theirtown', 'ID34567890', 'photo_url_4');
 INSERT INTO baby_nurse (baby_nurse_id, name, age, tel, address, id_number, photo) VALUES (5, 'Linda White', 40, '555-7890', '654 Cedar St, Hertown', 'ID45678901', 'photo_url_5');
+
+
+
+-- 注意：这里假设client表中至少有两个客户，其ID分别为1和2。
+
+
+INSERT INTO client (
+    id,
+    meal_plan_id,
+    recovery_plan_id,
+    assigned_baby_nurse,
+    name,
+    tel,
+    age,
+    scheduled_date,
+    check_in_date,
+    hospital_for_childbirth,
+    contact_name,
+    contact_tel,
+    mode_of_delivery,
+    room
+) VALUES (
+    1,
+    1, -- 假设meal_plan表中的ID
+    1, -- 假设recovery_plan表中的ID
+    1, -- 假设baby_nurse表中的ID
+    '张三',
+    '12345678901',
+    28,
+    '2024-06-01',
+    '2024-06-02',
+    '市第一医院',
+    '李四',
+    '10987654321',
+    '顺产',
+    NULL
+);
+
+INSERT INTO client (
+    id,
+    meal_plan_id,
+    recovery_plan_id,
+    assigned_baby_nurse,
+    name,
+    tel,
+    age,
+    scheduled_date,
+    check_in_date,
+    hospital_for_childbirth,
+    contact_name,
+    contact_tel,
+    mode_of_delivery,
+    room
+) VALUES (
+    2,
+    2, -- 假设meal_plan表中的ID
+    2, -- 假设recovery_plan表中的ID
+    2, -- 假设baby_nurse表中的ID
+    '王五',
+    '12312312345',
+    30,
+    '2024-07-10',
+    '2024-07-12',
+    '市第二医院',
+    '赵六',
+    '5432154321',
+    '剖宫产',
+    NULL
+);
+
+-- 请根据实际情况调整meal_plan_id, recovery_plan_id和assigned_baby_nurse的值
+-- 如果相关的外键表（meal_plan, recovery_plan, baby_nurse）还没有被创建或还没有数据
+-- 你需要先为它们添加相应的记录或在这里使用NULL或有效的默认值
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (1, '101A', 'Occupied', 1, '2024-03-01', '需要额外的床单');
+
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (2, '101B', 'Vacant', NULL, NULL, '刚刚装修过');
+
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (3, '102', 'Occupied', 2, '2024-03-05', '需要婴儿床');
+
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (4, '103', 'Under Maintenance', NULL, NULL, '更换空调系统');
+
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (5, '201', 'Vacant', NULL, NULL, '靠近电梯');

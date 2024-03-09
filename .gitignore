@@ -1,3 +1,8 @@
 
 *.pyc
 .idea/jupyter-settings.xml
+.DS_Store
+.idea/.DS_Store
+crud/.DS_Store
+model/.DS_Store
+schema/.DS_Store

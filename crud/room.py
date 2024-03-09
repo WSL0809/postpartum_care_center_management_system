@@ -67,9 +67,10 @@ def set_room_client(db: Session, client: RoomClientModel):
     set_status = client.set_status
     with db.begin():  # 开启一个事务块
         # 创建客户端条目
-        exists = db.query(model.Room) \
-                     .filter(model.Room.room_number == client.room) \
-                     .first() is not None
+        exists = (
+            db.query(model.Room).filter(model.Room.room_number == client.room).first()
+            is not None
+        )
 
         if not exists:
             return {"status": "fail", "details": "room does not exist"}
@@ -86,8 +87,7 @@ def set_room_client(db: Session, client: RoomClientModel):
             contact_name=client.contact_name,
             contact_tel=client.contact_tel,
             mode_of_delivery=client.mode_of_delivery,
-            room=client.room
-
+            room=client.room,
         )
         db.add(db_client)  # 将客户端条目添加到会话中，准备提交
 
@@ -112,21 +112,22 @@ def set_room_client(db: Session, client: RoomClientModel):
 
         # 更新房间状态
         # 先检查是否存在匹配的记录
-        exists = db.query(model.Room) \
-                     .filter(model.Room.room_number == client.room) \
-                     .first() is not None
+        exists = (
+            db.query(model.Room).filter(model.Room.room_number == client.room).first()
+            is not None
+        )
 
         if not exists:
             return {"status": "fail", "details": "room does not exist"}
         else:
             # 更新状态
-            db.query(model.Room) \
-                .filter(model.Room.room_number == client.room) \
-                .update({model.Room.status: set_status}, synchronize_session=False)
+            db.query(model.Room).filter(model.Room.room_number == client.room).update(
+                {model.Room.status: set_status}, synchronize_session=False
+            )
 
             # 更新客户ID
-            db.query(model.Room) \
-                .filter(model.Room.room_number == client.room) \
-                .update({model.Room.client_id: db_client.id}, synchronize_session=False)
+            db.query(model.Room).filter(model.Room.room_number == client.room).update(
+                {model.Room.client_id: db_client.id}, synchronize_session=False
+            )
 
     return {"status": "success", "details": "success"}
