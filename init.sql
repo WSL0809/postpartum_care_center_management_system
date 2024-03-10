@@ -89,16 +89,17 @@ INSERT INTO client (
 -- 如果相关的外键表（meal_plan, recovery_plan, baby_nurse）还没有被创建或还没有数据
 -- 你需要先为它们添加相应的记录或在这里使用NULL或有效的默认值
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (1, '101A', 'Occupied', 1, '2024-03-01', '需要额外的床单');
+VALUES (1, '101A', 'Occupied', NULL, '2024-03-01', '需要额外的床单');
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (2, '101B', 'Vacant', NULL, NULL, '刚刚装修过');
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (3, '102', 'Occupied', 2, '2024-03-05', '需要婴儿床');
+VALUES (3, '102', 'Occupied', NULL, '2024-03-05', '需要婴儿床');
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (4, '103', 'Under Maintenance', NULL, NULL, '更换空调系统');
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (5, '201', 'Vacant', NULL, NULL, '靠近电梯');
+
