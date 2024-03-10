@@ -17,12 +17,27 @@ from utils import verify_password
 from crud import create_user, get_user, get_clients_and_babies_by_name
 from schema import RoomModel
 from api import change_room_router, reserve_router
+from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(change_room_router)
 app.include_router(reserve_router)
+
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # 允许访问的源列表
+    allow_credentials=True,  # 允许携带cookie
+    allow_methods=["*"],  # 允许的HTTP方法
+    allow_headers=["*"],  # 允许的HTTP请求头
+)
+
 
 # Dependency
 def get_db():
