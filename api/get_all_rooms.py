@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette import status
 
+from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from main import get_current_active_user
 
 router = APIRouter()
 
