@@ -16,7 +16,7 @@ from database import engine, SessionLocal
 from utils import verify_password
 from crud import create_user, get_user, get_clients_and_babies_by_name
 from schema import RoomModel
-from api import change_room_router, reserve_router
+from api import change_room_router, reserve_router, get_all_rooms_router
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,7 +24,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(change_room_router)
 app.include_router(reserve_router)
-
+app.include_router(get_all_rooms_router)
 
 origins = [
     "*"
@@ -161,9 +161,9 @@ async def get_rooms(
     #
 
 
-@app.get("/get_all_rooms")
-async def get_all_rooms_info(db: Session = Depends(get_db)):
-    return crud.get_all_room_info(db)
+# @app.get("/get_all_rooms")
+# async def get_all_rooms_info(db: Session = Depends(get_db)):
+#     return crud.get_all_room_info(db)
 
 
 @app.post("/set_room_client")
