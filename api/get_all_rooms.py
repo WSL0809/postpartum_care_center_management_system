@@ -28,5 +28,5 @@ def get_all_room_info(db: Session = Depends(get_db)):
         """
     )
     result = db.execute(sql)
-    rooms_info = [dict(row) for row in result]
+    rooms_info = [dict(row) for row in result.mappings()]
     return rooms_info
