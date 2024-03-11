@@ -19,11 +19,7 @@ class GetAllRoomsResp(BaseModel):
 def get_all_room_info(db: Session = Depends(get_db)):
     sql = text(
         """
-        SELECT room.id, room.status, room.recently_used, room.notes,
-               client.name as client_name,
-               meal_plan.name as meal_plan_name,
-               recovery_plan.details as recovery_plan_details,
-               baby_nurse.name as baby_nurse_name
+        SELECT *
         FROM room
         JOIN client ON room.client_id = client.id
         LEFT JOIN meal_plan ON client.meal_plan_id = meal_plan.meal_plan_id
