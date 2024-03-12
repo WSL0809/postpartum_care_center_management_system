@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
+from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette import status
@@ -13,22 +14,17 @@ from model.client import BabyNurse
 router = APIRouter()
 
 
-class MealPlan(BaseModel):
-    details: str
-    duration: int
 
-
-class RecoveryPlan(BaseModel):
-    details: str
-    duration: int
 
 
 class GetAllRoomsResp(BaseModel):
     room_number: str
     name: str
     baby_nurse_name: str
-    meal_plan: MealPlan
-    recovery_plan: RecoveryPlan
+    meal_plan_details: str
+    meal_plan_duration: int
+    recovery_plan_details: str
+    recovery_plan_duration: int
     status: str
     recently_used: str
     notes: str
@@ -39,11 +35,11 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
         sql = text(
             """
             SELECT room_number,
-            client.name,
-            baby_nurse.name,
-            meal_plan.details, meal_plan.duration,
-            recovery_plan.details, recovery_plan.duration,
-            room.status, room.recently_used, room.notes
+            client.name AS name,
+            baby_nurse.name AS baby_nurse_name,
+            meal_plan.details AS meal_plan_details, meal_plan.duration AS meal_plan_duration,
+            recovery_plan.details AS recovery_plan_details, recovery_plan.duration AS recovery_plan_duration,
+            room.status AS status, room.recently_used AS recently_used, room.notes AS notes
             FROM room
             JOIN client ON room.client_id = client.id
             LEFT JOIN meal_plan ON client.meal_plan_id = meal_plan.meal_plan_id
@@ -51,25 +47,12 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
             LEFT JOIN baby_nurse ON client.assigned_baby_nurse = baby_nurse.baby_nurse_id
             """
         )
-        result = db.execute(sql).fetchall()
-        return [
-            GetAllRoomsResp(
-                room_number=row[0],
-                name=row[1],
-                baby_nurse_name=row[2],
-                meal_plan=MealPlan(
-                    details=row[3],
-                    duration=row[4]
-                ),
-                recovery_plan=RecoveryPlan(
-                    details=row[5],
-                    duration=row[6]
-                ),
-                status=row[7],
-                recently_used=row[8],
-                notes=row[9]
-            ) for row in result
-        ]
+        with db.begin():
+            result = db.execute(sql).mappings().all()
+            if result:
+                return [GetAllRoomsResp(**dict(row)) for row in result]
+            else:
+                return [{"message": "No rooms found"}]
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
