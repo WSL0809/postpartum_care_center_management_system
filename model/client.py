@@ -15,11 +15,11 @@ class Client(Base):
     tel = Column(String(255), nullable=False)
     age = Column(Integer, nullable=False)
     scheduled_date = Column(String(255), nullable=False)
-    check_in_date = Column(String(255), nullable=False)
+    check_in_date = Column(String(255))
     hospital_for_childbirth = Column(String(255), nullable=False)
     contact_name = Column(String(255), nullable=False)
     contact_tel = Column(String(255), nullable=False)
-    mode_of_delivery = Column(String(255), nullable=False)
+    mode_of_delivery = Column(String(255))
     room = Column(String(255), ForeignKey("room.room_number"), unique=True)
 
     babies = relationship("Baby", back_populates="client")

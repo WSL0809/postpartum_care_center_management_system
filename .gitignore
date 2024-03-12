@@ -1,9 +1,13 @@
 
 *.pyc
-.idea/jupyter-settings.xml
+.idea
 .DS_Store
+<<<<<<< Updated upstream
 .idea/.DS_Store
 crud/.DS_Store
 model/.DS_Store
 schema/.DS_Store
 .idea
+=======
+*.db
+>>>>>>> Stashed changes
