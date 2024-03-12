@@ -47,12 +47,11 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
             LEFT JOIN baby_nurse ON client.assigned_baby_nurse = baby_nurse.baby_nurse_id
             """
         )
-        with db.begin():
-            result = db.execute(sql).mappings().all()
-            if result:
-                return [GetAllRoomsResp(**dict(row)) for row in result]
-            else:
-                return [{"message": "No rooms found"}]
+        result = db.execute(sql).mappings().all()
+        if result:
+            return [GetAllRoomsResp(**dict(row)) for row in result]
+        else:
+            return []
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
