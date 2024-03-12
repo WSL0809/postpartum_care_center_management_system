@@ -33,7 +33,6 @@ class GetAllRoomsResp(BaseModel):
     recently_used: str
     notes: str
 
-
 @router.get("/get_all_rooms")
 def get_all_room_info(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     if current_user.role == "admin":
@@ -53,8 +52,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
             """
         )
         result = db.execute(sql).fetchall()
-        print(result)
-        rooms_info = [
+        return [
             GetAllRoomsResp(
                 room_number=row[0],
                 name=row[1],
@@ -72,12 +70,10 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
                 notes=row[9]
             ) for row in result
         ]
-        result = db.execute(sql).mappings().all()
-        print(result)
-        return rooms_info
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
