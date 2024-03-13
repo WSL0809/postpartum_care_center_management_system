@@ -43,46 +43,26 @@ class ReserveResp(BaseModel):
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
     db_client = model.Client(**reserve_recv.dict())
-    # db_client = model.Client(
-    #     meal_plan_id=reserve_recv.meal_plan_id,
-    #     recovery_plan_id=reserve_recv.recovery_plan_id,
-    #     assigned_baby_nurse=reserve_recv.assigned_baby_nurse,
-    #     name=reserve_recv.name,
-    #     tel=reserve_recv.tel,
-    #     age=reserve_recv.age,
-    #     scheduled_date=reserve_recv.scheduled_date,
-    #     check_in_date=reserve_recv.check_in_date,
-    #     hospital_for_childbirth=reserve_recv.hospital_for_childbirth,
-    #     contact_name=reserve_recv.contact_name,
-    #     contact_tel=reserve_recv.contact_tel,
-    #     mode_of_delivery=reserve_recv.mode_of_delivery,
-    #     room=reserve_recv.room,
-    # )
     create_client_sql = text(
         """
-        INSERT INTO client (id, name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room)
-        VALUES (:id, :name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room)
+        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room)
+        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room)
+        RETURNING id
         """
     )
     update_room_sql = text(
         """
-        UPDATE room SET status = :booked WHERE room_number = :room;
-        UPDATE room SET client_id = (SELECT id FROM client WHERE name = :name) WHERE room_number = :room;
+        UPDATE room SET status = :booked, client_id = :client_id WHERE room_number = :room;
         """
     )
     try:
         with db.begin():
-            client_data = dict(reserve_recv)
-            client_id = uuid.uuid4()  # 生成新的客户ID
-            client_data["id"] = client_id
-            db.execute(create_client_sql, client_data)
-
-
+            client_id = db.execute(create_client_sql, db_client).fetchone()[0]
             db.execute(update_room_sql,
-                       {"name": client_data.get("name"),  # 这里假设你从client_data中可以获取到name
-                        "room": client_data.get("room"),
+                       {
+                        "room": db_client.get("room"),
                         "booked": booked,
-                        "client_id": client_id  # 使用第一个操作生成的client_id
+                        "client_id": client_id
                         }
                        )
             # 如果以上操作都成功执行，事务会自动提交
