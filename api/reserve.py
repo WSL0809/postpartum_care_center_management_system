@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -69,18 +70,25 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         UPDATE room SET client_id = (SELECT id FROM client WHERE name = :name) WHERE room_number = :room;
         """
     )
-    with db.begin():
-        # db.add(db_client)
-        db.execute(create_client_sql, dict(reserve_recv).update({"id": uuid.uuid4()}))
-    with db.begin():
-        db.execute(update_room_sql,
-                   {"name": db_client.name,
-                    "room": db_client.room,
-                    "booked": booked,
-                    "client_id": db_client.id
-                    }
-                   )
+    try:
+        with db.begin():
+            client_data = dict(reserve_recv)
+            client_id = uuid.uuid4()  # 生成新的客户ID
+            client_data["id"] = client_id
+            db.execute(create_client_sql, client_data)
 
+
+            db.execute(update_room_sql,
+                       {"name": client_data.get("name"),  # 这里假设你从client_data中可以获取到name
+                        "room": client_data.get("room"),
+                        "booked": booked,
+                        "client_id": client_id  # 使用第一个操作生成的client_id
+                        }
+                       )
+            # 如果以上操作都成功执行，事务会自动提交
+    except SQLAlchemyError as e:
+        print("发生错误，事务回滚:", e)
+        raise e
 
 @router.post("/reserve")
 async def reserve_room(reserve_recv: ReserveRecv, db: Session = Depends(get_db)):
