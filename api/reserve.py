@@ -9,7 +9,7 @@ import model
 from api.utils import exception_handler
 from database import get_db
 from config import RoomStatus
-
+import uuid
 router = APIRouter()
 occupied = RoomStatus.Occupied.value
 booked = RoomStatus.Booked.value
@@ -57,6 +57,12 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
     #     mode_of_delivery=reserve_recv.mode_of_delivery,
     #     room=reserve_recv.room,
     # )
+    create_client_sql = text(
+        """
+        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room)
+        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room)
+        """
+    )
     update_room_sql = text(
         """
         UPDATE room SET status = :booked WHERE room_number = :room;
@@ -64,7 +70,8 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         """
     )
     with db.begin():
-        db.add(db_client)
+        # db.add(db_client)
+        db.execute(create_client_sql, dict(reserve_recv).update({"id": uuid.uuid4()}))
     with db.begin():
         db.execute(update_room_sql,
                    {"name": db_client.name,
@@ -82,3 +89,10 @@ async def reserve_room(reserve_recv: ReserveRecv, db: Session = Depends(get_db))
         return ReserveResp(status="success", details="预定成功")
     except Exception as e:
         return ReserveResp(status="error", details=str(e))
+'''
+the logic of reserve:
+1. about room table: update room.status = booked, update room.client_id
+2. about client table: add client
+3. do not add baby in reservation
+4. return ReserveResp
+'''
