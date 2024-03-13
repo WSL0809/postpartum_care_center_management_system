@@ -60,7 +60,7 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
             client_id = db.execute(create_client_sql, dict(reserve_recv)).fetchone()[0]
             db.execute(update_room_sql,
                        {
-                        "room": reserve_recv.get("room"),
+                        "room": reserve_recv.room,
                         "booked": booked,
                         "client_id": client_id
                         }
