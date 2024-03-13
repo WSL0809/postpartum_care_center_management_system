@@ -42,7 +42,7 @@ class ReserveResp(BaseModel):
 # 只新增client，不新增Baby
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
-    db_client = model.Client(**reserve_recv.dict())
+    # db_client = model.Client(**reserve_recv.dict())
     create_client_sql = text(
         """
         INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room)
@@ -57,10 +57,10 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
     )
     try:
         with db.begin():
-            client_id = db.execute(create_client_sql, db_client).fetchone()[0]
+            client_id = db.execute(create_client_sql, dict(reserve_recv)).fetchone()[0]
             db.execute(update_room_sql,
                        {
-                        "room": db_client.get("room"),
+                        "room": reserve_recv.get("room"),
                         "booked": booked,
                         "client_id": client_id
                         }
