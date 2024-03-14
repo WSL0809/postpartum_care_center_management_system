@@ -4,6 +4,7 @@ the logic of check_out
 2. about client table: delete client
 3. return CheckOutResp
 """
+from datetime import datetime
 from typing import Union
 
 from fastapi import APIRouter, Depends
@@ -43,9 +44,10 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
         DELETE FROM client WHERE name = :room_number
         """
     )
+
     try:
         with db.begin():
-            db.execute(update_room_sql, dict(check_out_recv))
+            db.execute(update_room_sql, dict(check_out_recv).update({"recently_used": datetime.now().strftime("%Y-%m-%d"), "status": free}))
             # db.execute(update_client_sql, dict(check_out_recv))
 
     except SQLAlchemyError as e:
