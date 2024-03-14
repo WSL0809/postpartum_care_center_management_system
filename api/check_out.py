@@ -34,7 +34,7 @@ class CheckOutResp(BaseModel):
 def update_room_and_client(db, check_out_recv: CheckOutRecv):
     update_room_sql = text(
         """
-        UPDATE room SET status = :free, client_id = NULL, recently_used = :recently_used
+        UPDATE room SET status = :status, client_id = NULL, recently_used = :recently_used
         WHERE room_number = :room_number
         """
     )
