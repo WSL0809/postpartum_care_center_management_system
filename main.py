@@ -174,9 +174,9 @@ async def set_room_client(
     return crud.set_room_client(db, client)
 
 
-@app.post("/check_out")
-async def check_out(client: ClientCreate, db: Session = Depends(get_db)):
-    return crud.set_room_client(db, client)
+# @app.post("/check_out")
+# async def check_out(client: ClientCreate, db: Session = Depends(get_db)):
+#     return crud.set_room_client(db, client)
 
 
 # @app.post("/book")
