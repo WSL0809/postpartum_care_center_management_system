@@ -45,7 +45,7 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
     try:
         with db.begin():
             db.execute(update_room_sql, dict(check_out_recv))
-            db.execute(update_client_sql, dict(check_out_recv))
+            # db.execute(update_client_sql, dict(check_out_recv))
 
     except SQLAlchemyError as e:
         raise Exception(str(e))
