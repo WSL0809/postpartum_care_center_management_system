@@ -10,10 +10,11 @@ import model
 from api.utils import exception_handler
 from database import get_db
 from config import RoomStatus
-import uuid
+
 router = APIRouter()
 occupied = RoomStatus.Occupied.value
 booked = RoomStatus.Booked.value
+
 
 class ReserveRecv(BaseModel):
     name: str
@@ -39,7 +40,6 @@ class ReserveResp(BaseModel):
     details: str
 
 
-# 只新增client，不新增Baby
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
     # db_client = model.Client(**reserve_recv.dict())
@@ -60,15 +60,16 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
             client_id = db.execute(create_client_sql, dict(reserve_recv)).fetchone()[0]
             db.execute(update_room_sql,
                        {
-                        "room": reserve_recv.room,
-                        "booked": booked,
-                        "client_id": client_id
-                        }
+                           "room": reserve_recv.room,
+                           "booked": booked,
+                           "client_id": client_id
+                       }
                        )
             # 如果以上操作都成功执行，事务会自动提交
     except SQLAlchemyError as e:
         print("发生错误，事务回滚:", e)
         raise e
+
 
 @router.post("/reserve")
 async def reserve_room(reserve_recv: ReserveRecv, db: Session = Depends(get_db)):
@@ -77,6 +78,8 @@ async def reserve_room(reserve_recv: ReserveRecv, db: Session = Depends(get_db))
         return ReserveResp(status="success", details="预定成功")
     except Exception as e:
         return ReserveResp(status="error", details=str(e))
+
+
 '''
 the logic of reserve:
 1. about room table: update room.status = booked, update room.client_id

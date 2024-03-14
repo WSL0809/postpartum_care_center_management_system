@@ -1,15 +1,12 @@
+from typing import Union
+
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import get_db
-from database import engine
 from config import RoomStatus
-from functools import wraps
-from sqlalchemy.exc import SQLAlchemyError
-from .utils import exception_handler
-
-
 
 
 router = APIRouter()
@@ -17,66 +14,60 @@ free = RoomStatus.Free.value
 occupied = RoomStatus.Occupied.value
 
 
-class ChangeRoomRecv(BaseModel):
-    old_room_number: str
-    new_room_number: str
-    client_name: str
+class BabyRecv(BaseModel):
+    name: Union[str, None]
+    gender: str
+    birth_date: str
+    birth_weight: str
+    birth_height: str
+    health_status: str
+    birth_certificate: str
+    remarks: str
+    mom_id_number: str
+    dad_id_number: str
+    summary: str
+
+    class Config:
+        orm_mode = True
 
 
-class ChangeRoomResp(BaseModel):
+class CheckInRecv(BaseModel):
+    room_number: str
+    baby: BabyRecv
+    check_in_date: str
+
+
+class CheckInResp(BaseModel):
     status: str
     details: str
 
-@exception_handler
-def update_client_and_room(
-    db, old_room_number: str, new_room_number: str, client_name: str
-):
-    """
-    Update the room number for a client in the database.
-
-    Args:
-    - db: Session: The database session
-    - old_room_number: str: The old room number
-    - new_room_number: str: The new room number
-    """
-    sql_update_client = text(
+def update_room_and_baby(db, check_in_recv: CheckInRecv):
+    update_room_sql = text(
         """
-        UPDATE client SET room = :new_room_number WHERE room = :old_room_number
+        UPDATE room SET status = :occupied, client_id = :client_id
+        WHERE room_number = :room_number
         """
     )
-
-    sql_update_room = text(
+    update_baby_sql = text(
         """
-        UPDATE room SET status = :free WHERE room_number = :old_room_number;
-        UPDATE room SET client_id = NULL WHERE room_number = :old_room_number;
-        UPDATE room SET status = :occupied WHERE room_number = :new_room_number;
-        UPDATE room SET client_id = (SELECT id FROM client WHERE name = :client_name) WHERE room_number = :new_room_number;
+        INSERT INTO baby (name, gender, birth_date, birth_weight, birth_height, 
+        health_status, birth_certificate, remarks, mom_id_number, dad_id_number, summary, client_id)
+        VALUES (:name, :gender, :birth_date, :birth_weight, :birth_height, 
+        :health_status, :birth_certificate, :remarks, :mom_id_number, :dad_id_number, :summary, :client_id)
         """
     )
-
-    with db.begin():
-        db.execute(
-            sql_update_client,
-            {"new_room_number": new_room_number, "old_room_number": old_room_number},
-        )
-        db.execute(
-            sql_update_room,
-            {
-                "free": free,
-                "occupied": occupied,
-                "new_room_number": new_room_number,
-                "old_room_number": old_room_number,
-                "client_name": client_name,
-            },
-        )
+    try:
+        with db.begin():
+            db.execute(update_room_sql, dict(check_in_recv))
+            db.execute(update_baby_sql, dict(check_in_recv))
+    except SQLAlchemyError as e:
+        return {"status": "fail", "details": str(e)}
 
 
-@router.post("/change_room", response_model=ChangeRoomResp)
-async def change_room(change_room_recv: ChangeRoomRecv, db: Session = Depends(get_db)):
-    update_client_and_room(
-        db,
-        change_room_recv.old_room_number,
-        change_room_recv.new_room_number,
-        change_room_recv.client_name,
-    )
-    return ChangeRoomResp(status="success", details="success")
+@router.post("/check_in")
+def check_in_room(check_in_recv: CheckInRecv, db: Session = Depends(get_db)):
+    try:
+        update_room_and_baby(db, check_in_recv)
+        return CheckInResp(status="success", details="入住成功")
+    except Exception as e:
+        return CheckInResp(status="error", details=str(e))
