@@ -37,6 +37,7 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
         WHERE room_number = :room_number
         """
     )
+    print(update_room_sql)
     update_client_sql = text(
         """
         DELETE FROM client WHERE name = :room_number
