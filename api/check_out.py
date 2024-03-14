@@ -48,7 +48,7 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
             db.execute(update_client_sql, dict(check_out_recv))
 
     except SQLAlchemyError as e:
-        return {"status": "fail", "details": str(e)}
+        raise Exception(str(e))
 
 
 @router.post("/check_out")

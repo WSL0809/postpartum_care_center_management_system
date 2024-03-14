@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from database import get_db
 from config import RoomStatus
 
-
 router = APIRouter()
 free = RoomStatus.Free.value
 occupied = RoomStatus.Occupied.value
@@ -27,9 +26,6 @@ class BabyRecv(BaseModel):
     dad_id_number: str
     summary: str
 
-    class Config:
-        orm_mode = True
-
 
 class CheckInRecv(BaseModel):
     room_number: str
@@ -40,6 +36,7 @@ class CheckInRecv(BaseModel):
 class CheckInResp(BaseModel):
     status: str
     details: str
+
 
 def update_room_and_baby(db, check_in_recv: CheckInRecv):
     update_room_sql = text(
@@ -61,7 +58,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
             db.execute(update_room_sql, dict(check_in_recv))
             db.execute(update_baby_sql, dict(check_in_recv))
     except SQLAlchemyError as e:
-        return {"status": "fail", "details": str(e)}
+        raise e
 
 
 @router.post("/check_in")
