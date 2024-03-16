@@ -27,6 +27,7 @@ app.include_router(reserve_router)
 app.include_router(get_all_rooms_router)
 app.include_router(check_in_router)
 app.include_router(check_out_router)
+app.include_router(get_room_by_room_name_router)
 origins = [
     "*"
 ]
