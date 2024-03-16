@@ -21,6 +21,7 @@ class Client(Base):
     contact_tel = Column(String(255), nullable=False)
     mode_of_delivery = Column(String(255))
     room = Column(String(255), ForeignKey("room.room_number"), unique=True)
+    id_number = Column(String(255), unique=True)
 
     babies = relationship("Baby", back_populates="client")
 
