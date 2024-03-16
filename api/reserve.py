@@ -69,7 +69,6 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
                            "client_id": client_id
                        }
                        )
-            # 如果以上操作都成功执行，事务会自动提交
     except SQLAlchemyError as e:
         print("发生错误，事务回滚:", e)
         raise e
