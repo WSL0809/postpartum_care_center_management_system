@@ -64,7 +64,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         # 执行更新房间状态的操作
         db.execute(update_room_sql, {"room_number": check_in_recv.room_number, "occupied": occupied})
         # 插入婴儿信息
-        baby_data = check_in_recv.baby.model_dump()
+        baby_data = dict(check_in_recv.baby)
         baby_data["room_number"] = check_in_recv.room_number
         db.execute(update_baby_sql, baby_data)
         db.commit()
