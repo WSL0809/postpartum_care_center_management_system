@@ -60,19 +60,22 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         """
     )
     try:
-        with db.begin():
-            client_id = db.execute(create_client_sql, dict(reserve_recv)).fetchone()[0]
-            db.execute(update_room_sql,
-                       {
-                           "room": reserve_recv.room,
-                           "booked": booked,
-                           "client_id": client_id
-                       }
-                       )
+        # 执行创建客户操作
+        client_id = db.execute(create_client_sql, reserve_recv.dict()).fetchone()[0]
+        db.flush()  # 确保客户ID可用
+        # 使用新客户ID更新房间状态
+        db.execute(update_room_sql,
+                   {
+                       "room": reserve_recv.room,
+                       "booked": booked,
+                       "client_id": client_id
+                   }
+                  )
+        db.commit()  # 提交事务
     except SQLAlchemyError as e:
+        db.rollback()  # 发生错误时回滚事务
         print("发生错误，事务回滚:", e)
         raise e
-
 
 @router.post("/reserve")
 async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
