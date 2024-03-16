@@ -33,9 +33,9 @@ class GetRoomByRoomNameRecv(BaseModel):
     room_number: str
 
 
-
-@router.get("/get_room_by_room_name")
-def get_all_room_info(room_number: str, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+@router.get("/get_room_by_room_name", response_model=GetRoomByRoomNameResp)
+def get_all_room_info(room_number: str, current_user: User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -49,7 +49,7 @@ def get_all_room_info(room_number: str, current_user: User = Depends(get_current
         baby_nurse.name AS baby_nurse_name,
         meal_plan.details AS meal_plan_details, meal_plan.duration AS meal_plan_duration,
         recovery_plan.details AS recovery_plan_details, recovery_plan.duration AS recovery_plan_duration,
-        room.status AS room_status, room.recently_used AS recently_used, room.notes AS notes
+        room.status AS status, room.recently_used AS recently_used, room.notes AS notes
         FROM room
         LEFT JOIN client ON room.client_id = client.id
         LEFT JOIN meal_plan ON client.meal_plan_id = meal_plan.meal_plan_id
@@ -65,4 +65,3 @@ def get_all_room_info(room_number: str, current_user: User = Depends(get_current
     else:
         # 将结果转换为字典，以便返回
         return dict(result)
-
