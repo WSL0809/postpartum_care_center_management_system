@@ -45,7 +45,7 @@ def get_all_room_info(room_number: str, current_user: User = Depends(get_current
     sql = text(
         """
         SELECT room_number,
-        client.name AS client_name,
+        client.name AS name,
         baby_nurse.name AS baby_nurse_name,
         meal_plan.details AS meal_plan_details, meal_plan.duration AS meal_plan_duration,
         recovery_plan.details AS recovery_plan_details, recovery_plan.duration AS recovery_plan_duration,
