@@ -1,13 +1,16 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from starlette import status
 
 import model
 from api.utils import exception_handler
+from auth import get_current_active_user
+from auth_schema import User
 from database import get_db
 from config import RoomStatus
 
@@ -72,13 +75,19 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
 
 
 @router.post("/reserve")
-async def reserve_room(reserve_recv: ReserveRecv, db: Session = Depends(get_db)):
-    try:
-        update_client_and_room(db, reserve_recv)
-        return ReserveResp(status="success", details="预定成功")
-    except Exception as e:
-        return ReserveResp(status="error", details=str(e))
-
+async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    if current_user.role == "admin":
+        try:
+            update_client_and_room(db, reserve_recv)
+            return ReserveResp(status="success", details="预定成功")
+        except Exception as e:
+            return ReserveResp(status="error", details=str(e))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 '''
 the logic of reserve:
