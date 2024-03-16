@@ -79,6 +79,7 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
 
 @router.post("/reserve")
 async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    print(dict(reserve_recv))
     if current_user.role == "admin":
         try:
             update_client_and_room(db, reserve_recv)
