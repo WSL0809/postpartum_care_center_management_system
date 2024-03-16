@@ -41,7 +41,7 @@ class CheckInResp(BaseModel):
 def update_room_and_baby(db, check_in_recv: CheckInRecv):
     update_room_sql = text(
         """
-        UPDATE room SET status = :occupied, client_id = :client_id
+        UPDATE room SET status = :occupied
         WHERE room_number = :room_number
         """
     )
