@@ -22,7 +22,7 @@ class Client(Base):
     mode_of_delivery = Column(String(255))
     room = Column(String(255), ForeignKey("room.room_number"), unique=True)
     id_number = Column(String(255), unique=True)
-    status = Column(Integer, default=0)
+    status = Column(Integer, nullable=False, default=0)
 
     babies = relationship("Baby", back_populates="client")
 
