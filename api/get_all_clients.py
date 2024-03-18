@@ -9,6 +9,7 @@ from auth_schema import User
 from database import get_db
 from model import Client
 from schema import ClientBase
+import re
 
 router = APIRouter()
 
@@ -26,8 +27,19 @@ class GetAllClientsResp(BaseModel):
     pagination: Pagination
 
 
+def clean_input(input_string):
+    # 去除首尾空格
+    cleaned = input_string.strip()
+    # 去除内部多余的空格（将一个或多个连续的空白字符替换为单个空格）
+    cleaned = re.sub(r'\s+', ' ', cleaned)
+    # 去除换行符和制表符
+    cleaned = cleaned.replace('\n', '').replace('\t', '')
+    return cleaned
+
+
 def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     # 计算起始记录
+    name = clean_input(name)
     offset = (page - 1) * limit
 
     query = db.query(Client)
