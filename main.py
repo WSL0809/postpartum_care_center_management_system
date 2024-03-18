@@ -154,18 +154,15 @@ async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
     return crud.create_client(db, client)
 
 
-@app.get("/get_room_by_id")
-async def get_rooms(
-    db: Session = Depends(get_db), room_id: int = Query(default=None, alias="room_id")
-):
-    # 获取 room join client
-    return crud.get_room_by_id(db, room_id)
-    #
+# @app.get("/get_room_by_id")
+# async def get_rooms(
+#     db: Session = Depends(get_db), room_id: int = Query(default=None, alias="room_id")
+# ):
+#     # 获取 room join client
+#     return crud.get_room_by_id(db, room_id)
+#     #
 
 
-# @app.get("/get_all_rooms")
-# async def get_all_rooms_info(db: Session = Depends(get_db)):
-#     return crud.get_all_room_info(db)
 
 
 @app.post("/set_room_client")
@@ -173,19 +170,6 @@ async def set_room_client(
     client: schema.room.RoomClientModel, db: Session = Depends(get_db)
 ):
     return crud.set_room_client(db, client)
-
-
-# @app.post("/check_out")
-# async def check_out(client: ClientCreate, db: Session = Depends(get_db)):
-#     return crud.set_room_client(db, client)
-
-
-# @app.post("/book")
-# async def check_in(client: ClientCreate, db: Session = Depends(get_db)):
-#     return crud.set_room(db, client, "booked")
-# @app.post("/repair")
-# async def check_in(client: ClientCreate, db: Session = Depends(get_db)):
-#     return crud.set_room(db, client, "under_maintenance")
 
 
 @app.get("/hello")
