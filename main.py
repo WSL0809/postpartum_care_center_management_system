@@ -165,11 +165,11 @@ async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
 
 
 
-@app.post("/set_room_client")
-async def set_room_client(
-    client: schema.room.RoomClientModel, db: Session = Depends(get_db)
-):
-    return crud.set_room_client(db, client)
+# @app.post("/set_room_client")
+# async def set_room_client(
+#     client: schema.room.RoomClientModel, db: Session = Depends(get_db)
+# ):
+#     return crud.set_room_client(db, client)
 
 
 @app.get("/hello")

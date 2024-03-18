@@ -2,7 +2,6 @@ from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
-from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette import status
@@ -10,8 +9,7 @@ from starlette import status
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from model import Room, Client
-from model.client import BabyNurse
+
 
 router = APIRouter()
 
