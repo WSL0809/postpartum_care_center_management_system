@@ -21,7 +21,8 @@ class ClientBase(BaseModel):
     assigned_baby_nurse: int
     room: str
 
-
+    class Config:
+        orm_mode = True
 class ClientCreate(ClientBase):
     class Config:
         orm_mode = True
