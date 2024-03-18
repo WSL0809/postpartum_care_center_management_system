@@ -45,7 +45,7 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     return total, clients_data
 
 
-@router.get("/get_clients_by_name", response_model=GetAllClientsResp)
+@router.get("/get_clients", response_model=GetAllClientsResp)
 def get_clients_by_name(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db),
                         name: Optional[str] = Query(None), page: int = 1, limit: int = 10):
     if current_user.role != "admin":
