@@ -37,10 +37,12 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     # 查询客户数据
     clients = query.offset(offset).limit(limit).all()
 
+    clients_data = [ClientBase.from_orm(client) for client in clients]
+
     # 计算总记录数
     total = query.count()
 
-    return total, clients
+    return total, clients_data
 
 
 @router.get("/get_clients_by_name", response_model=GetAllClientsResp)
