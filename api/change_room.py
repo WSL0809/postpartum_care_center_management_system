@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Union
+
+from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -8,12 +10,8 @@ from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
 from config import RoomStatus
-from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 from .utils import exception_handler
-
-
-
 
 router = APIRouter()
 free = RoomStatus.Free.value
@@ -27,12 +25,13 @@ class ChangeRoomRecv(BaseModel):
 
 
 class ChangeRoomResp(BaseModel):
-    status: str
+    status: Union[str, int]
     details: str
+
 
 @exception_handler
 def update_client_and_room(
-    db, old_room_number: str, new_room_number: str, client_name: str
+        db, old_room_number: str, new_room_number: str, client_name: str
 ):
     """
     Update the room number for a client in the database.
@@ -82,17 +81,17 @@ def update_client_and_room(
 
 
 @router.post("/change_room", response_model=ChangeRoomResp)
-async def change_room(change_room_recv: ChangeRoomRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+async def change_room(change_room_recv: ChangeRoomRecv, current_user: User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
     if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+        return ChangeRoomResp(status=status.HTTP_401_UNAUTHORIZED, details="没有访问权限")
+    try:
+        update_client_and_room(
+            db,
+            change_room_recv.old_room_number,
+            change_room_recv.new_room_number,
+            change_room_recv.client_name,
         )
-    update_client_and_room(
-        db,
-        change_room_recv.old_room_number,
-        change_room_recv.new_room_number,
-        change_room_recv.client_name,
-    )
-    return ChangeRoomResp(status="success", details="success")
+        return ChangeRoomResp(status=status.HTTP_200_OK, details="complete")
+    except SQLAlchemyError as e:
+        return ChangeRoomResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=f'database error: {e}')
