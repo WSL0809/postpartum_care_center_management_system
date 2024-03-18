@@ -103,3 +103,34 @@ VALUES (4, '8004', '0', NULL, NULL, '更换空调系统');
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (5, '8005', '0', NULL, NULL, '靠近电梯');
 
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (6, '8006', '0', NULL, NULL, '靠近电梯');
+
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (7, '8007', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (8, '8008', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (9, '8009', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (10, '8010', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (11, '8011', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (12, '8012', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (13, '8013', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (14, '8014', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (15, '8015', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (16, '8016', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (17, '8017', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (18, '8018', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (19, '8019', '0', NULL, NULL, '靠近电梯');
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (20, '8020', '0', NULL, NULL, '靠近电梯');

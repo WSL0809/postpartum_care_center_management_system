@@ -16,7 +16,7 @@ from database import engine, SessionLocal
 from utils import verify_password
 from crud import create_user, get_user, get_clients_and_babies_by_name
 from schema import RoomModel
-from api import change_room_router, reserve_router, get_all_rooms_router, check_in_router, check_out_router, get_room_by_room_name_router
+from api import change_room_router, reserve_router, get_all_rooms_router, check_in_router, check_out_router, get_room_by_room_name_router, get_all_clients_router
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
@@ -28,6 +28,8 @@ app.include_router(get_all_rooms_router)
 app.include_router(check_in_router)
 app.include_router(check_out_router)
 app.include_router(get_room_by_room_name_router)
+app.include_router(get_all_clients_router)
+
 origins = [
     "*"
 ]
@@ -135,18 +137,18 @@ async def get_users(
         )
 
 
-@app.get("/get_clients/")
-async def get_clients(
-    page: int = Query(default=1, alias="page"),
-    page_size: int = Query(default=1000, alias="pageSize"),
-    db: Session = Depends(get_db),
-    client_name: str = None,
-):
-    # 使用提供的last_client_id和page_size进行查询
-    clients = get_clients_and_babies_by_name(db, client_name, page, page_size)
-
-    # 假设此处我们直接返回查询到的客户信息
-    return clients
+# @app.get("/get_clients/")
+# async def get_clients(
+#     page: int = Query(default=1, alias="page"),
+#     page_size: int = Query(default=1000, alias="pageSize"),
+#     db: Session = Depends(get_db),
+#     client_name: str = None,
+# ):
+#     # 使用提供的last_client_id和page_size进行查询
+#     clients = get_clients_and_babies_by_name(db, client_name, page, page_size)
+#
+#     # 假设此处我们直接返回查询到的客户信息
+#     return clients
 
 
 @app.post("/create_client/", response_model=ClientBase)

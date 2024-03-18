@@ -88,6 +88,9 @@ class BabyNurse(Base):
     address = Column(String(255))
     id_number = Column(String(255))
     photo = Column(String(255))
+    permanent_address = Column(String(255))
+    level = Column(String(255))
+    mark = Column(String(255))
 
 
 class MealPlan(Base):
