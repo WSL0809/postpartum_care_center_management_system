@@ -26,7 +26,7 @@ class GetAllClientsResp(BaseModel):
     pagination: Pagination
 
 
-def get_clients_by_name(db: Session, name: Optional[str], page: int, limit: int):
+def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     # 计算起始记录
     offset = (page - 1) * limit
 
@@ -49,7 +49,7 @@ def get_clients_by_name(current_user: User = Depends(get_current_active_user), d
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    total, clients = get_clients_by_name(db, name, page, limit)
+    total, clients = get_clients(db, name, page, limit)
     if not clients:
         raise HTTPException(status_code=404, detail="Clients not found")
 
