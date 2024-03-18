@@ -1,7 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from starlette import status
+
+from auth import get_current_active_user
+from auth_schema import User
 from database import get_db
 from config import RoomStatus
 from functools import wraps
@@ -78,7 +82,13 @@ def update_client_and_room(
 
 
 @router.post("/change_room", response_model=ChangeRoomResp)
-async def change_room(change_room_recv: ChangeRoomRecv, db: Session = Depends(get_db)):
+async def change_room(change_room_recv: ChangeRoomRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     update_client_and_room(
         db,
         change_room_recv.old_room_number,

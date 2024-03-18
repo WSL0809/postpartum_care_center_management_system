@@ -1,10 +1,14 @@
 from typing import Union
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from starlette import status
+
+from auth import get_current_active_user
+from auth_schema import User
 from database import get_db
 from config import RoomStatus
 
@@ -74,7 +78,13 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
 
 
 @router.post("/check_in")
-def check_in_room(check_in_recv: CheckInRecv, db: Session = Depends(get_db)):
+def check_in_room(check_in_recv: CheckInRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     try:
         update_room_and_baby(db, check_in_recv)
         return CheckInResp(status="success", details="入住成功")
