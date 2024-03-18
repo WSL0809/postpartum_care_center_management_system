@@ -33,7 +33,7 @@ def clean_input(input_string):
     # 去除内部多余的空格（将一个或多个连续的空白字符替换为单个空格）
     cleaned = re.sub(r'\s+', '', cleaned)
     # 去除换行符和制表符
-    cleaned = cleaned.replace('\n', '').replace('\t', '')
+    cleaned = cleaned.replace('\n', '').replace('\t', '').replace('%20', ' ')
     return cleaned
 
 
