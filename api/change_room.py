@@ -3,7 +3,6 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import get_db
-from database import engine
 from config import RoomStatus
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -54,11 +53,12 @@ def update_client_and_room(
         """
     )
 
-    with db.begin():
+    try:
         db.execute(
             sql_update_client,
             {"new_room_number": new_room_number, "old_room_number": old_room_number},
         )
+
         db.execute(
             sql_update_room,
             {
@@ -69,6 +69,12 @@ def update_client_and_room(
                 "client_name": client_name,
             },
         )
+
+        db.commit()
+    except Exception as e:
+        # 遇到错误，回滚事务
+        db.rollback()
+        print(f"Transaction failed: {e}")
 
 
 @router.post("/change_room", response_model=ChangeRoomResp)
