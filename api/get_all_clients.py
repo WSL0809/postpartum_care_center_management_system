@@ -39,11 +39,12 @@ def clean_input(input_string):
 
 def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     # 计算起始记录
-    name = clean_input(name)
+
     offset = (page - 1) * limit
 
     query = db.query(Client)
     if name:
+        name = clean_input(name)
         query = query.filter(Client.name.ilike(f"%{name}%"))
 
     # 查询客户数据
