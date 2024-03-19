@@ -27,7 +27,8 @@ class GetAllRoomsResp(BaseModel):
     status: str
     recently_used: Union[str, None]
     notes: Union[str, None]
-
+    meal_plan_seller: Union[dict, None]
+    recovery_plan_seller: Union[dict, None]
 
 @router.get("/get_all_rooms")
 def get_all_room_info(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
@@ -35,7 +36,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
         sql = text(
             """
             SELECT room_number,
-            client.name AS name,
+            client.name AS name, client.meal_plan_seller AS meal_plan_seller, client.recovery_plan_seller AS recovery_plan_seller,
             baby_nurse.name AS baby_nurse_name,
             meal_plan.details AS meal_plan_details, meal_plan.duration AS meal_plan_duration,
             recovery_plan.details AS recovery_plan_details, recovery_plan.duration AS recovery_plan_duration,
