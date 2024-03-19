@@ -1,4 +1,5 @@
 from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String, Text, Date
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -23,6 +24,8 @@ class Client(Base):
     room = Column(String(255), ForeignKey("room.room_number"))
     id_number = Column(String(255), unique=True)
     status = Column(Integer, default=0)
+    meal_plan_seller = Column(JSONB)
+    recovery_plan_seller = Column(JSONB)
 
     babies = relationship("Baby", back_populates="client")
 
