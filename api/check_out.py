@@ -48,10 +48,10 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
     )
 
     try:
-        with db.begin():
-            print(f'update_room_sql: {dict(check_out_recv)}')
-            db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
-            db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
+        print(f'update_room_sql: {dict(check_out_recv)}')
+        db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
+        db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
+        db.commit()
     except SQLAlchemyError as e:
         raise Exception(str(e))
 
