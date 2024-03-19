@@ -20,7 +20,7 @@ class Client(Base):
     contact_name = Column(String(255), nullable=False)
     contact_tel = Column(String(255), nullable=False)
     mode_of_delivery = Column(String(255))
-    room = Column(String(255), ForeignKey("room.room_number"), unique=True)
+    room = Column(String(255), ForeignKey("room.room_number"))
     id_number = Column(String(255), unique=True)
     status = Column(Integer, default=0)
 
