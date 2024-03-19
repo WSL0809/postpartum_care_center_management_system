@@ -13,8 +13,10 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from config import RoomStatus
+from config import RoomStatus, ClientStatus
 from database import get_db
+from datetime import datetime
+
 
 router = APIRouter()
 
@@ -41,17 +43,15 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
     print(update_room_sql)
     update_client_sql = text(
         """
-        DELETE FROM client WHERE name = :room_number
+        UPDATE client SET status = :status, room = NULL WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
     )
 
     try:
         with db.begin():
             print(f'update_room_sql: {dict(check_out_recv)}')
-            # db.execute(update_room_sql, dict(check_out_recv).update({"recently_used": datetime.now().strftime("%Y-%m-%d"), "status": free}))
-            db.execute(update_client_sql, {"room_number": check_out_recv.room_number, "recently_used": check_out_recv.recently_used, "status": free})
-            # db.execute(update_client_sql, dict(check_out_recv))
-
+            db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
+            db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
     except SQLAlchemyError as e:
         raise Exception(str(e))
 

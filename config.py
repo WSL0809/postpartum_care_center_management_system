@@ -10,3 +10,8 @@ class RoomStatus(Enum):
     Repair = "3"
     # 已预约的房间
     Booked = "1"
+
+
+class ClientStatus(Enum):
+    in_there = 0
+    out = 1
