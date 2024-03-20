@@ -1,7 +1,8 @@
+import json
 from typing import Union, Dict
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, json
+from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
