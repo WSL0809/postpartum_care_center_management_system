@@ -34,9 +34,6 @@ class CheckOutResp(BaseModel):
 
 
 def update_room_and_client(db, check_out_recv):
-    check_client_id_sql = select([text("client_id")]).select_from(text("room")).where(
-        text("room_number = :room_number"))
-
     update_room_sql = text(
         """
         UPDATE room SET status = :status, client_id = NULL, recently_used = :recently_used
