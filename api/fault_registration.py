@@ -1,7 +1,7 @@
-from typing import Union
+from typing import Union, Dict
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, json
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -20,7 +20,7 @@ repair = RoomStatus.Repair.value
 
 class FaultRegistrationRecv(BaseModel):
     room_number: str
-    fault_list: dict
+    fault_list: Dict
 
 
 class FaultRegistrationResp(BaseModel):
