@@ -28,15 +28,16 @@ class FaultRegistrationResp(BaseModel):
     status: str
     details: Union[str, None]
 
-def repair_complete(room_number: str, fault_list: Dict, db: Session):
+
+def repair_complete(room_number: str, db: Session):
     sql = text(
         """
-        UPDATE room SET status = :status, fault_list = :fault_list WHERE room_number = :room_number;
+        UPDATE room SET status = :status, fault_list = NULL WHERE room_number = :room_number;
         
         """
     )
     try:
-        db.execute(sql, {"room_number": room_number, "status": free, "fault_list": json.dumps(fault_list)})
+        db.execute(sql, {"room_number": room_number, "status": free})
         db.commit()
     except SQLAlchemyError:
         db.rollback()
@@ -50,6 +51,7 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
         return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
 
     if fault_registration is None:
+        print("fault_registration is None")
         repair_complete(fault_registration.room_number, fault_registration.fault_list, db)
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="修理完成")
 
@@ -65,7 +67,8 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
         result = db.execute(is_room_free, {"room_number": fault_registration.room_number, "status": free}).first()
         db.commit()
     except SQLAlchemyError:
-        return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details="未找到该房间或房间不在空闲状态")
+        return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                     details="未找到该房间或房间不在空闲状态")
     if result:
         sql = text(
             """
@@ -82,4 +85,5 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
             return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=f"故障登记失败: {e}")
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="故障登记成功")
     else:
+
         return FaultRegistrationResp(status=status.HTTP_400_BAD_REQUEST, details="房间不在空闲状态")
