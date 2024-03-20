@@ -56,8 +56,8 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
         try:
             db.execute(sql, {"status": repair, "room_number": fault_registration.room_number,
                              "fault_list": fault_registration.fault_list})
-        except SQLAlchemyError:
-            return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details="故障登记失败")
+        except SQLAlchemyError as e:
+            return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=f"故障登记失败: {e}")
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="故障登记成功")
     else:
         return FaultRegistrationResp(status=status.HTTP_400_BAD_REQUEST, details="房间不在空闲状态")
