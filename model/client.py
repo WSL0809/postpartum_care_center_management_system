@@ -26,6 +26,7 @@ class Client(Base):
     status = Column(Integer, default=0)
     meal_plan_seller = Column(JSONB)
     recovery_plan_seller = Column(JSONB)
+    double_check_password = Column(String(255))
 
     babies = relationship("Baby", back_populates="client")
 

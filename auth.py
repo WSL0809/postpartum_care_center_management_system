@@ -8,11 +8,13 @@ import utils
 from auth_schema import TokenData, User
 from database import get_db
 
+
 def get_user(db: Session, user_name: str):
     return db.query(model.User).filter(model.User.username == user_name).first()
 
+
 def get_current_user(
-    token: str = Depends(utils.oauth2_scheme), db: Session = Depends(get_db)
+        token: str = Depends(utils.oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
