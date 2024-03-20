@@ -28,12 +28,30 @@ class FaultRegistrationResp(BaseModel):
     status: str
     details: Union[str, None]
 
+def repair_complete(room_number: str, fault_list: Dict, db: Session):
+    sql = text(
+        """
+        UPDATE room SET status = :status, fault_list = :fault_list WHERE room_number = :room_number;
+        
+        """
+    )
+    try:
+        db.execute(sql, {"room_number": room_number, "status": free, "fault_list": json.dumps(fault_list)})
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        return FaultRegistrationResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details="修理失败")
+
 
 @router.post("/fault_registration")
 def fault_registration(fault_registration: FaultRegistrationRecv, current_user: User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
     if current_user.role != "admin":
         return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
+
+    if len(fault_registration.fault_list) == 0:
+        repair_complete(fault_registration.room_number, fault_registration.fault_list, db)
+        return FaultRegistrationResp(status=status.HTTP_200_OK, details="修理完成")
 
     is_room_free = text(
         """
