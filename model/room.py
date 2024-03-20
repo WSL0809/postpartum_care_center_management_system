@@ -13,4 +13,4 @@ class Room(Base):
     client_id = Column(Integer, ForeignKey("client.id"))
     recently_used = Column(String(255))
     notes = Column(String(255))
-    maintenance_list = Column(JSONB)
+    fault_list = Column(JSONB)
