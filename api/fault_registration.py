@@ -51,7 +51,6 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
         return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
 
     if fault_registration.fault_list is None:
-        print("fault_registration is None")
         repair_complete(fault_registration.room_number, fault_registration.fault_list, db)
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="修理完成")
 
