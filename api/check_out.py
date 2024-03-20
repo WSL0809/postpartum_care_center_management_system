@@ -4,15 +4,17 @@ the logic of check_out
 2. about client table: delete client
 3. return CheckOutResp
 """
-from datetime import datetime
 from typing import Union
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from starlette import status
 
+from auth import get_current_active_user
+from auth_schema import User
 from config import RoomStatus, ClientStatus
 from database import get_db
 from datetime import datetime
@@ -26,6 +28,7 @@ free = RoomStatus.Free.value
 class CheckOutRecv(BaseModel):
     room_number: str
     recently_used: Union[str, None]
+    double_check_password: str
 
 
 class CheckOutResp(BaseModel):
@@ -61,9 +64,15 @@ def update_room_and_client(db, check_out_recv):
 
 
 @router.post("/check_out")
-async def check_out_room(check_out_recv: CheckOutRecv, db: Session = Depends(get_db)):
+async def check_out_room(check_out_recv: CheckOutRecv, current_user: User = Depends(get_current_active_user),  db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        return CheckOutResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
+
+    if current_user.double_check_password != check_out_recv.double_check_password:
+        return CheckOutResp(status=status.HTTP_401_UNAUTHORIZED, details="密码错误")
+
     try:
         update_room_and_client(db, check_out_recv)
-        return CheckOutResp(status="success", details="退房成功")
+        return CheckOutResp(status=status.HTTP_200_OK, details="退房成功")
     except Exception as e:
-        return CheckOutResp(status="error", details=str(e))
+        return CheckOutResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=str(e))

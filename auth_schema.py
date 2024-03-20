@@ -6,11 +6,13 @@ class UserBase(BaseModel):
     id: int
     username: str
     email: str
+    double_check_password: Union[str, None]
 
 
 class User(UserBase):
     is_active: bool
     role: str
+
 
     class Config:
         orm_mode = True

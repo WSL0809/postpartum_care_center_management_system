@@ -54,7 +54,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 def create_user(db: Session, user: auth_schema.UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = model.User(
-        username=user.username, email=user.email, hashed_password=hashed_password
+        username=user.username, email=user.email, hashed_password=hashed_password, double_check_password=user.double_check_password
     )
     db.add(db_user)
     db.commit()

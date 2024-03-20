@@ -12,3 +12,4 @@ class User(Base):
     role = Column(String, default="admin")
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+    double_check_password = Column(String(255), default="88888888")

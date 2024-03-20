@@ -137,41 +137,9 @@ async def get_users(
         )
 
 
-# @app.get("/get_clients/")
-# async def get_clients(
-#     page: int = Query(default=1, alias="page"),
-#     page_size: int = Query(default=1000, alias="pageSize"),
-#     db: Session = Depends(get_db),
-#     client_name: str = None,
-# ):
-#     # 使用提供的last_client_id和page_size进行查询
-#     clients = get_clients_and_babies_by_name(db, client_name, page, page_size)
-#
-#     # 假设此处我们直接返回查询到的客户信息
-#     return clients
-
-
 @app.post("/create_client/", response_model=ClientBase)
 async def read_clients(client: ClientCreate, db: Session = Depends(get_db)):
     return crud.create_client(db, client)
-
-
-# @app.get("/get_room_by_id")
-# async def get_rooms(
-#     db: Session = Depends(get_db), room_id: int = Query(default=None, alias="room_id")
-# ):
-#     # 获取 room join client
-#     return crud.get_room_by_id(db, room_id)
-#     #
-
-
-
-
-# @app.post("/set_room_client")
-# async def set_room_client(
-#     client: schema.room.RoomClientModel, db: Session = Depends(get_db)
-# ):
-#     return crud.set_room_client(db, client)
 
 
 @app.get("/hello")
