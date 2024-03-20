@@ -9,7 +9,7 @@ from typing import Union
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from sqlalchemy import text
+from sqlalchemy import text, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -33,14 +33,17 @@ class CheckOutResp(BaseModel):
     details: str
 
 
-def update_room_and_client(db, check_out_recv: CheckOutRecv):
+def update_room_and_client(db, check_out_recv):
+    check_client_id_sql = select([text("client_id")]).select_from(text("room")).where(
+        text("room_number = :room_number"))
+
     update_room_sql = text(
         """
         UPDATE room SET status = :status, client_id = NULL, recently_used = :recently_used
         WHERE room_number = :room_number
         """
     )
-    print(update_room_sql)
+
     update_client_sql = text(
         """
         UPDATE client SET status = :status, room = NULL WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
@@ -48,10 +51,27 @@ def update_room_and_client(db, check_out_recv: CheckOutRecv):
     )
 
     try:
-        db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
-        db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
+        # 先检查对应的client_id是否存在
+        client_id_result = db.execute(check_client_id_sql, {"room_number": check_out_recv.room_number}).fetchone()
+        if not client_id_result:
+            raise ValueError(f"No client found for room number {check_out_recv.room_number}")
+
+        # 执行更新room表的操作
+        db.execute(update_room_sql,
+                   {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
+                    "status": free})
+
+        # 执行更新client表的操作
+        db.execute(update_client_sql,
+                   {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
+
         db.commit()
+    except ValueError as ve:
+        # 如果没有找到对应的client_id，可以在这里处理异常
+        db.rollback()
+        raise ve
     except SQLAlchemyError as e:
+        db.rollback()
         raise Exception(str(e))
 
 
