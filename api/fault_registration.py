@@ -21,7 +21,7 @@ repair = RoomStatus.Repair.value
 
 class FaultRegistrationRecv(BaseModel):
     room_number: str
-    fault_list: Dict
+    fault_list: Union[Dict, None]
 
 
 class FaultRegistrationResp(BaseModel):
@@ -49,7 +49,7 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
     if current_user.role != "admin":
         return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
 
-    if len(fault_registration.fault_list) == 0:
+    if fault_registration is None:
         repair_complete(fault_registration.room_number, fault_registration.fault_list, db)
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="修理完成")
 
