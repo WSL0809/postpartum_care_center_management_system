@@ -50,7 +50,7 @@ def fault_registration(fault_registration: FaultRegistrationRecv, current_user: 
     if current_user.role != "admin":
         return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
 
-    if fault_registration.fault_list is None:
+    if fault_registration.fault_list == '' or fault_registration.fault_list is None:
         repair_complete(fault_registration.room_number, db)
         return FaultRegistrationResp(status=status.HTTP_200_OK, details="修理完成")
 
