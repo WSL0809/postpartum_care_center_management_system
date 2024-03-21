@@ -1,24 +1,22 @@
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
-from fastapi import Depends, FastAPI, HTTPException, status, Query
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 import crud
-import schema.room
 import utils
-from schema import ClientBase, ClientCreate, ClientList, ClientModel
+from schema import ClientBase, ClientCreate
 from auth_schema import UserCreate, User, TokenData
 import models
 from database import engine, SessionLocal
 from utils import verify_password
-from crud import create_user, get_user, get_clients_and_babies_by_name
-from schema import RoomModel
+from crud import create_user, get_user
 from api import (change_room_router, reserve_router, get_all_rooms_router, check_in_router,
                  check_out_router, get_room_by_room_name_router, get_all_clients_router,
-                 fault_registration_router)
+                 fault_registration_router, get_baby_nurse_router)
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
@@ -32,6 +30,7 @@ app.include_router(check_out_router)
 app.include_router(get_room_by_room_name_router)
 app.include_router(get_all_clients_router)
 app.include_router(fault_registration_router)
+app.include_router(get_baby_nurse_router)
 
 origins = [
     "*"
