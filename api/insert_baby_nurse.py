@@ -16,7 +16,7 @@ router = APIRouter()
 
 class InsertBabyNurseRecv(BaseModel):
     name: Optional[str] = None
-    age: Optional[str] = None
+    age: Optional[int] = None
     tel: Optional[str] = None
     address: Optional[str] = None
     id_number: Optional[str] = None
