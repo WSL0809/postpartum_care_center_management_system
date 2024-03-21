@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 from .baby import Baby
 from .plan import MealPlanModel, RecoveryPlanModel
 from .base import BabyNurseModel
