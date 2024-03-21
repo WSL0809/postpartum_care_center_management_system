@@ -85,10 +85,6 @@ def get_clients_by_name(current_user: User = Depends(get_current_active_user), d
         "limit": limit,
         "total": total
     }
-
-    return {
-        "status": "success",
-        "details": "Clients fetched successfully.",
-        "clients": baby_nurses,
-        "pagination": pagination
-    }
+    return GetBabyNurseResp(
+        status=status.HTTP_200_OK, details="Clients fetched successfully.", clients=baby_nurses, pagination=pagination
+    )
