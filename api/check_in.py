@@ -35,6 +35,7 @@ class CheckInRecv(BaseModel):
     room_number: str
     baby: BabyRecv
     check_in_date: str
+    assigned_baby_nurse_name: str
 
 
 class CheckInResp(BaseModel):
@@ -63,6 +64,12 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
 
         """
     )
+    update_client_sql = text(
+        """
+        UPDATE client SET check_in_date = :check_in_date, assigned_baby_nurse = (SELECT baby_nurse_id AS assigned_baby_nurse FROM baby_nurse WHERE name = :assigned_baby_nurse_name)
+        WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
+        """
+    )
 
     try:
         # 执行更新房间状态的操作
@@ -71,6 +78,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         baby_data = dict(check_in_recv.baby)
         baby_data["room_number"] = check_in_recv.room_number
         db.execute(update_baby_sql, baby_data)
+        db.execute(update_client_sql, {"room_number": check_in_recv.room_number, "check_in_date": check_in_recv.check_in_date, "assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name})
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()

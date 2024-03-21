@@ -32,7 +32,7 @@ class ReserveRecv(BaseModel):
     meal_plan_id: int
     recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
-    assigned_baby_nurse: int
+    assigned_baby_nurse: Optional[int] = None
     room: str
 
     class Config:
