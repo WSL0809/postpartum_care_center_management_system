@@ -16,19 +16,6 @@ import re
 router = APIRouter()
 
 
-class Pagination(BaseModel):
-    page: int
-    limit: int
-    total: int
-
-
-class GetBabyNurseResp(BaseModel):
-    status: Union[str, int]
-    details: str
-    clients: Union[List[ClientBase], None]
-    pagination: Union[Pagination, None]
-
-
 class BabyNurseModel(BaseModel):
     baby_nurse_id: Optional[int] = None
     name: Optional[str] = None
@@ -43,6 +30,19 @@ class BabyNurseModel(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Pagination(BaseModel):
+    page: int
+    limit: int
+    total: int
+
+
+class GetBabyNurseResp(BaseModel):
+    status: Union[str, int]
+    details: str
+    clients: Union[List[BabyNurseModel], None]
+    pagination: Union[Pagination, None]
 
 
 def clean_input(input_string):
