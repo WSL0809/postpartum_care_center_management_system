@@ -43,7 +43,7 @@ def insert_baby_nurse(baby_nurse_recv: InsertBabyNurseRecv, current_user: User =
     try:
         db.add(baby_nurse)
         db.commit()
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         db.rollback()
-        return InsertBabyNurseResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details="insert baby_nurse failed")
+        return InsertBabyNurseResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=f"insert baby_nurse failed because: {e}")
     return InsertBabyNurseResp(status=status.HTTP_200_OK, details="insert baby_nurse success")
