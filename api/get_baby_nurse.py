@@ -15,15 +15,19 @@ import re
 
 router = APIRouter()
 
+
 class Pagination(BaseModel):
     page: int
     limit: int
     total: int
+
+
 class GetBabyNurseResp(BaseModel):
     status: Union[str, int]
     details: str
     clients: Union[List[ClientBase], None]
     pagination: Union[Pagination, None]
+
 
 class BabyNurseModel(BaseModel):
     baby_nurse_id: Optional[int] = None
@@ -33,6 +37,9 @@ class BabyNurseModel(BaseModel):
     address: Optional[str] = None
     id_number: Optional[str] = None
     photo: Optional[str] = None
+    permanent_address: Optional[str] = None
+    level: Optional[str] = None
+    mark: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -57,11 +64,13 @@ def get_baby_nurses(db: Session, name: Optional[str], page: int, limit: int):
     baby_nurse_data = [BabyNurseModel.from_orm(baby_nurse) for baby_nurse in baby_nurses]
     total = query.count()
     return total, baby_nurse_data
+
+
 @router.get("/get_baby_nurse", response_model=GetBabyNurseResp)
 def get_clients_by_name(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db),
-                       name: Optional[str] = Query(None),
-                       page: int = 1,
-                       limit: int = 10):
+                        name: Optional[str] = Query(None),
+                        page: int = 1,
+                        limit: int = 10):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
