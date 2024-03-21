@@ -7,3 +7,4 @@ from .get_room_by_room_name import router as get_room_by_room_name_router
 from  .get_all_clients import router as get_all_clients_router
 from .fault_registration import router as fault_registration_router
 from .get_baby_nurse import router as get_baby_nurse_router
+from .insert_baby_nurse import router as insert_baby_nurse_router
