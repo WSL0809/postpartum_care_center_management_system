@@ -18,17 +18,17 @@ occupied = RoomStatus.Occupied.value
 
 
 class BabyRecv(BaseModel):
-    name: Union[str, None] = "0"
-    gender: Union[str, None] = "0"
-    birth_date: Union[str, None] = "0"
-    birth_weight: Union[str, None] = "0"
-    birth_height: Union[str, None] = "0"
-    health_status: Union[str, None] = "0"
-    birth_certificate: Union[str, None] = "0"
-    remarks: Union[str, None] = "0"
-    mom_id_number: Union[str, None] = "0"
-    dad_id_number: Union[str, None] = "0"
-    summary: Union[str, None] = "0"
+    name: Union[str, None] = "未填写"
+    gender: Union[str, None] = "未填写"
+    birth_date: Union[str, None] = "未填写"
+    birth_weight: Union[str, None] = "未填写"
+    birth_height: Union[str, None] = "未填写"
+    health_status: Union[str, None] = "未填写"
+    birth_certificate: Union[str, None] = "未填写"
+    remarks: Union[str, None] = "未填写"
+    mom_id_number: Union[str, None] = "未填写"
+    dad_id_number: Union[str, None] = "未填写"
+    summary: Union[str, None] = "未填写"
 
 
 class CheckInRecv(BaseModel):
