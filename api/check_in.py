@@ -19,13 +19,13 @@ occupied = RoomStatus.Occupied.value
 
 class BabyRecv(BaseModel):
     name: Union[str, None] = "0"
-    gender: str
-    birth_date: str
-    birth_weight: str
-    birth_height: str
-    health_status: str
+    gender: Union[str, None] = "0"
+    birth_date: Union[str, None] = "0"
+    birth_weight: Union[str, None] = "0"
+    birth_height: Union[str, None] = "0"
+    health_status: Union[str, None] = "0"
     birth_certificate: Union[str, None] = "0"
-    remarks: str
+    remarks: Union[str, None] = "0"
     mom_id_number: Union[str, None] = "0"
     dad_id_number: Union[str, None] = "0"
     summary: Union[str, None] = "0"
