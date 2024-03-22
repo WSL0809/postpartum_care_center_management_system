@@ -27,7 +27,7 @@ def pick_clients_by_birthday(db: Session):
 
     query = text("SELECT name, age, tel FROM client WHERE SUBSTRING(id_number, 11, 4) = :today")
 
-    clients_birthday_today = db.execute(query, {'today': today}).fetchall()
+    clients_birthday_today = db.execute(query, {'today': today}).mappings().all()
 
     return clients_birthday_today
 
@@ -38,7 +38,7 @@ def pick_babies_by_birthday(db: Session):
     get_baby_mom = text("SELECT name, age, tel FROM client "
                         "WHERE id = (SELECT client_id FROM baby WHERE birth_date = :today)")
 
-    clients_birthday_today = db.execute(get_baby_mom, {'today': today}).fetchall()
+    clients_birthday_today = db.execute(get_baby_mom, {'today': today}).mappings().all()
 
     return clients_birthday_today
 
