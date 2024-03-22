@@ -91,7 +91,7 @@ class BabyNurse(Base):
     tel = Column(String(255))
     address = Column(String(255))
     id_number = Column(String(255))
-    photo = Column(String(255))
+    childcare_certificate = Column(String(255))
     permanent_address = Column(String(255))
     level = Column(String(255))
     mark = Column(String(255))

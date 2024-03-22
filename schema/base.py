@@ -10,7 +10,7 @@ class BabyNurse(BaseModel):
     tel: str
     address: str
     id_number: str
-    photo: str
+    childcare_certificate: str
 
 
 class BabyNurseModel(BaseModel):
@@ -20,4 +20,4 @@ class BabyNurseModel(BaseModel):
     tel: Optional[str] = None
     address: Optional[str] = None
     id_number: Optional[str] = None
-    photo: Optional[str] = None
+    childcare_certificate: Optional[str] = None

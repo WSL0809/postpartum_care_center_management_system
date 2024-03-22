@@ -20,7 +20,7 @@ class InsertBabyNurseRecv(BaseModel):
     tel: Optional[str] = None
     address: Optional[str] = None
     id_number: Optional[str] = None
-    photo: Optional[str] = None
+    childcare_certificate: Optional[str] = None
     permanent_address: Optional[str] = None
     level: Optional[str] = None
     mark: Optional[str] = None
