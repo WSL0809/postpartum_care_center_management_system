@@ -95,6 +95,7 @@ class BabyNurse(Base):
     permanent_address = Column(String(255))
     level = Column(String(255))
     mark = Column(String(255))
+    work_status = Column(String(255))
 
 
 class MealPlan(Base):

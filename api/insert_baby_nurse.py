@@ -24,6 +24,7 @@ class InsertBabyNurseRecv(BaseModel):
     permanent_address: Optional[str] = None
     level: Optional[str] = None
     mark: Optional[str] = None
+    work_status: Optional[str] = None
 
     class Config:
         orm_mode = True
