@@ -18,6 +18,9 @@ class ReminderResp(BaseModel):
     tel: str
     remind_content: str
 
+    class Config:
+        orm_mode = True
+
 def pick_clients_by_birthday(db: Session):
     # 获取今天的日期，格式为 MMDD
     today = datetime.today().strftime('%m%d')
