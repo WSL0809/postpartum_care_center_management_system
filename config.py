@@ -15,3 +15,12 @@ class RoomStatus(Enum):
 class ClientStatus(Enum):
     in_there = 0
     out = 1
+
+
+class BabyNurseWorkStatus(Enum):
+    # 工作中
+    working = '0'
+    # 待命
+    standby = '1'
+    # 休息
+    rest = '2'

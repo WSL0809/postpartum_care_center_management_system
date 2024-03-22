@@ -10,12 +10,12 @@ from starlette import status
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from config import RoomStatus
+from config import RoomStatus, BabyNurseWorkStatus
 
 router = APIRouter()
 free = RoomStatus.Free.value
 occupied = RoomStatus.Occupied.value
-
+working = BabyNurseWorkStatus.working.value
 
 class BabyRecv(BaseModel):
     name: Union[str, None] = "未填写"
@@ -71,6 +71,13 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         """
     )
 
+    update_baby_nurse_work_status_sql = text(
+        """
+        UPDATE baby_nurse SET work_status = :working
+        WHERE name = :assigned_baby_nurse_name
+        """
+    )
+
     try:
         # 执行更新房间状态的操作
         db.execute(update_room_sql, {"room_number": check_in_recv.room_number, "occupied": occupied})
@@ -79,6 +86,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         baby_data["room_number"] = check_in_recv.room_number
         db.execute(update_baby_sql, baby_data)
         db.execute(update_client_sql, {"room_number": check_in_recv.room_number, "check_in_date": check_in_recv.check_in_date, "assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name})
+        db.execute(update_baby_nurse_work_status_sql, {"assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name, "working": working})
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()

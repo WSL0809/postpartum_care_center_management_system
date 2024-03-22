@@ -15,9 +15,10 @@ from starlette import status
 
 from auth import get_current_active_user
 from auth_schema import User
-from config import RoomStatus, ClientStatus
+from config import RoomStatus, ClientStatus, BabyNurseWorkStatus
 from database import get_db
 from datetime import datetime
+standby = BabyNurseWorkStatus.standby.value
 
 
 router = APIRouter()
@@ -50,9 +51,16 @@ def update_room_and_client(db, check_out_recv):
         """
     )
 
+    update_baby_nurse_work_status_sql = text(
+        """
+        UPDATE baby_nurse SET work_status = :standby WHERE baby_nurse_id = (SELECT assigned_baby_nurse FROM client WHERE room = :room_number)
+        """
+    )
+
     try:
         db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
         db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
+        db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
         db.commit()
     except ValueError as ve:
         # 如果没有找到对应的client_id，可以在这里处理异常
