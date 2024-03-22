@@ -15,7 +15,7 @@ router = APIRouter()
 class ReminderResp(BaseModel):
     name: str
     age: int
-    phone: str
+    tel: str
     remind_content: str
 
 def pick_clients_by_birthday(db: Session):
