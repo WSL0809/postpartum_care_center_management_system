@@ -15,15 +15,6 @@ Base = declarative_base()
 
 
 def get_db() -> Session:
-    """
-    Provide a database session to the caller. The session should be closed after use.
-
-    Yields:
-        Session: A database session.
-
-    Yields:
-        None
-    """
     db = SessionLocal()
     try:
         yield db
