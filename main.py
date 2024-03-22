@@ -16,7 +16,8 @@ from utils import verify_password
 from crud import create_user, get_user
 from api import (change_room_router, reserve_router, get_all_rooms_router, check_in_router,
                  check_out_router, get_room_by_room_name_router, get_all_clients_router,
-                 fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router)
+                 fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router,
+                 reminder_router)
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
@@ -32,6 +33,7 @@ app.include_router(get_all_clients_router)
 app.include_router(fault_registration_router)
 app.include_router(get_baby_nurse_router)
 app.include_router(insert_baby_nurse_router)
+app.include_router(reminder_router)
 origins = [
     "*"
 ]

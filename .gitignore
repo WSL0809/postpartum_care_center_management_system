@@ -11,3 +11,5 @@ schema/.DS_Store
 =======
 *.db
 >>>>>>> Stashed changes
+.DS_Store
+.idea/.DS_Store
