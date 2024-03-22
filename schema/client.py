@@ -19,7 +19,7 @@ class ClientBase(BaseModel):
     recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
     assigned_baby_nurse: Union[int, None]
-    room: str
+    room: Union[int, None]
 
     class Config:
         orm_mode = True
