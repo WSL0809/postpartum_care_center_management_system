@@ -36,7 +36,7 @@ def pick_babies_by_birthday(db: Session):
     today = datetime.today().strftime('%Y-%m-%d')
 
     get_baby_mom = text("SELECT name, age, tel FROM client "
-                        "WHERE id = (SELECT client_id FROM baby WHERE birth_date = :today)")
+                        "WHERE id IN (SELECT client_id FROM baby WHERE birth_date = :today)")
 
     clients_birthday_today = db.execute(get_baby_mom, {'today': today}).mappings().all()
 
