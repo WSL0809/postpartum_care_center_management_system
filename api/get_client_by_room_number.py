@@ -23,7 +23,7 @@ class GetClientByRoomResp(BaseModel):
 def do_get_client_in_room(db: Session, room_number: str):
     query = db.query(Client)
     if room_number:
-        query = query.filter(Client.room_number == room_number)
+        query = query.filter(Client.room == room_number)
     client = query.first()
     return client
 
