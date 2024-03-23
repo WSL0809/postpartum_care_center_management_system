@@ -19,8 +19,8 @@ class ClientStatus(Enum):
 
 class BabyNurseWorkStatus(Enum):
     # 工作中
-    working = '0'
+    working = '1'
     # 待命
-    standby = '1'
+    standby = '0'
     # 休息
     rest = '2'
