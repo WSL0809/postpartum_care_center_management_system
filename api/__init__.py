@@ -9,3 +9,4 @@ from .fault_registration import router as fault_registration_router
 from .get_baby_nurse import router as get_baby_nurse_router
 from .insert_baby_nurse import router as insert_baby_nurse_router
 from .reminder import router as reminder_router
+from .get_client_by_room_number import router as get_client_by_room_number_router
