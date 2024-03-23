@@ -34,6 +34,8 @@ app.include_router(fault_registration_router)
 app.include_router(get_baby_nurse_router)
 app.include_router(insert_baby_nurse_router)
 app.include_router(reminder_router)
+app.include_router(get_client_by_room_number_router)
+
 origins = [
     "*"
 ]

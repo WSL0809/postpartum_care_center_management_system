@@ -10,7 +10,6 @@ from auth_schema import User
 from database import get_db
 from model import Client
 from schema import ClientBase
-import re
 
 router = APIRouter()
 
