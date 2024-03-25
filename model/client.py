@@ -8,7 +8,7 @@ from database import Base
 class Client(Base):
     __tablename__ = "client"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     meal_plan_id = Column(Integer, ForeignKey("meal_plan.meal_plan_id"))
     recovery_plan_id = Column(Integer, ForeignKey("recovery_plan.recovery_plan_id"))
     assigned_baby_nurse = Column(Integer, ForeignKey("baby_nurse.baby_nurse_id"))
