@@ -3,7 +3,7 @@ FROM python:3.10
 WORKDIR /app
 COPY . /app
 RUN pip install --upgrade pip --no-cache && \
-    pip install -r requirements.txt
+    pip install --no-cache -r requirements.txt
 
 EXPOSE 80
 
