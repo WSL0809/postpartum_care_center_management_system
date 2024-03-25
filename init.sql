@@ -1,3 +1,31 @@
+-- 月子套餐
+create table meal_plan
+(
+    meal_plan_id serial
+        primary key,
+    details      text,
+    duration     integer
+);
+
+alter table meal_plan
+    owner to postgres;
+
+-- 产康套餐
+
+create table recovery_plan
+(
+    recovery_plan_id serial
+        primary key,
+    details          text,
+    duration         integer
+);
+
+alter table recovery_plan
+    owner to postgres;
+
+
+
+
 INSERT INTO meal_plan (meal_plan_id, details, duration) VALUES (1, 'Low Carb Plan for 30 Days', 30);
 INSERT INTO meal_plan (meal_plan_id, details, duration) VALUES (2, 'Vegan Wellness Plan, Full of Greens', 15);
 INSERT INTO meal_plan (meal_plan_id, details, duration) VALUES (3, 'High Protein Plan for Muscle Building', 60);

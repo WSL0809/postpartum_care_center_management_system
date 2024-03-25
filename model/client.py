@@ -31,24 +31,24 @@ class Client(Base):
     babies = relationship("Baby", back_populates="client")
 
 
-class RemovedClient(Base):
-    __tablename__ = "removed_client"
-
-    id = Column(Integer, primary_key=True)
-    meal_plan_id = Column(Integer)
-    recovery_plan_id = Column(Integer)
-    assigned_baby_nurse = Column(Integer)
-    name = Column(String(255), nullable=False)
-    tel = Column(String(255), nullable=False)
-    age = Column(Integer, nullable=False)
-    scheduled_date = Column(String(255), nullable=False)
-    check_in_date = Column(String(255), nullable=False)
-    hospital_for_childbirth = Column(String(255), nullable=False)
-    contact_name = Column(String(255), nullable=False)
-    contact_tel = Column(String(255), nullable=False)
-    mode_of_delivery = Column(String(255), nullable=False)
-    room = Column(String(255), ForeignKey("room.room_number"), unique=True)
-    status = Column(String(255), nullable=False)
+# class RemovedClient(Base):
+#     __tablename__ = "removed_client"
+#
+#     id = Column(Integer, primary_key=True)
+#     meal_plan_id = Column(Integer)
+#     recovery_plan_id = Column(Integer)
+#     assigned_baby_nurse = Column(Integer)
+#     name = Column(String(255), nullable=False)
+#     tel = Column(String(255), nullable=False)
+#     age = Column(Integer, nullable=False)
+#     scheduled_date = Column(String(255), nullable=False)
+#     check_in_date = Column(String(255), nullable=False)
+#     hospital_for_childbirth = Column(String(255), nullable=False)
+#     contact_name = Column(String(255), nullable=False)
+#     contact_tel = Column(String(255), nullable=False)
+#     mode_of_delivery = Column(String(255), nullable=False)
+#     room = Column(String(255), ForeignKey("room.room_number"), unique=True)
+#     status = Column(String(255), nullable=False)
 
 
 class Baby(Base):
@@ -71,15 +71,15 @@ class Baby(Base):
     client = relationship("Client", back_populates="babies")
 
 
-class ClientBabyNurse(Base):
-    __tablename__ = "client_baby_nurse"
-
-    id = Column(Integer, primary_key=True)
-    client_id = Column(Integer, ForeignKey("client.id"))
-    baby_nurse_id = Column(Integer, ForeignKey("baby_nurse.baby_nurse_id"))
-    start_date = Column(String(255), nullable=False)
-    end_date = Column(String(255), nullable=False)
-    status = Column(String(255), nullable=False)
+# class ClientBabyNurse(Base):
+#     __tablename__ = "client_baby_nurse"
+#
+#     id = Column(Integer, primary_key=True)
+#     client_id = Column(Integer, ForeignKey("client.id"))
+#     baby_nurse_id = Column(Integer, ForeignKey("baby_nurse.baby_nurse_id"))
+#     start_date = Column(String(255), nullable=False)
+#     end_date = Column(String(255), nullable=False)
+#     status = Column(String(255), nullable=False)
 
 
 class BabyNurse(Base):

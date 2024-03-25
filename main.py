@@ -10,7 +10,7 @@ import crud
 import utils
 from schema import ClientBase, ClientCreate
 from auth_schema import UserCreate, User, TokenData
-import models
+import model
 from database import engine, SessionLocal
 from utils import verify_password
 from crud import create_user, get_user
@@ -20,7 +20,7 @@ from api import (change_room_router, reserve_router, get_all_rooms_router, check
                  reminder_router, get_client_by_room_number_router)
 from fastapi.middleware.cors import CORSMiddleware
 
-models.Base.metadata.create_all(bind=engine)
+model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(change_room_router)
