@@ -95,48 +95,48 @@ INSERT INTO client (id, meal_plan_id, recovery_plan_id, assigned_baby_nurse, nam
 -- 如果相关的外键表（meal_plan, recovery_plan, baby_nurse）还没有被创建或还没有数据
 -- 你需要先为它们添加相应的记录或在这里使用NULL或有效的默认值
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (1, '8001', '0', NULL, '2024-03-01', '需要额外的床单');
+VALUES (1, '8001', '0', NULL, NULL, NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (2, '8002', '0', NULL, NULL, '刚刚装修过');
+VALUES (2, '8002', '0', NULL, NULL, NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (3, '8003', '0', NULL, '2024-03-05', '需要婴儿床');
+VALUES (3, '8003', '0', NULL, NULL, NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (4, '8004', '0', NULL, NULL, '更换空调系统');
+VALUES (4, '8004', '0', NULL, NULL, NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (5, '8005', '0', NULL, NULL, '靠近电梯');
+VALUES (5, '8005', '0', NULL, NULL, NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (6, '8006', '0', NULL, NULL, '靠近电梯');
+VALUES (6, '8006', '0', NULL, NULL,NULL);
 
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (7, '8007', '0', NULL, NULL, '靠近电梯');
+VALUES (7, '8007', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (8, '8008', '0', NULL, NULL, '靠近电梯');
+VALUES (8, '8008', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (9, '8009', '0', NULL, NULL, '靠近电梯');
+VALUES (9, '8009', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (10, '8010', '0', NULL, NULL, '靠近电梯');
+VALUES (10, '8010', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (11, '8011', '0', NULL, NULL, '靠近电梯');
+VALUES (11, '8011', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (12, '8012', '0', NULL, NULL, '靠近电梯');
+VALUES (12, '8012', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (13, '8013', '0', NULL, NULL, '靠近电梯');
+VALUES (13, '8013', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (14, '8014', '0', NULL, NULL, '靠近电梯');
+VALUES (14, '8014', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (15, '8015', '0', NULL, NULL, '靠近电梯');
+VALUES (15, '8015', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (16, '8016', '0', NULL, NULL, '靠近电梯');
+VALUES (16, '8016', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (17, '8017', '0', NULL, NULL, '靠近电梯');
+VALUES (17, '8017', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (18, '8018', '0', NULL, NULL, '靠近电梯');
+VALUES (18, '8018', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (19, '8019', '0', NULL, NULL, '靠近电梯');
+VALUES (19, '8019', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
-VALUES (20, '8020', '0', NULL, NULL, '靠近电梯');
+VALUES (20, '8020', '0', NULL, NULL, NULL);

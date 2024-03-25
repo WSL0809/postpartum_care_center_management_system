@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Union
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -8,18 +10,18 @@ from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
 
-
 router = APIRouter()
 
 
 class ReminderResp(BaseModel):
     name: str
-    age: int
+    age: Union[int, str]
     tel: str
     remind_content: str
 
     class Config:
         orm_mode = True
+
 
 def pick_clients_by_birthday(db: Session):
     # 获取今天的日期，格式为 MMDD
@@ -31,12 +33,13 @@ def pick_clients_by_birthday(db: Session):
 
     return clients_birthday_today
 
+
 def pick_babies_by_birthday(db: Session):
     # 获取今天的日期，格式为 MMDD
     today = datetime.today().strftime('%Y-%m-%d')
 
-    get_baby_mom = text("SELECT name, age, tel FROM client "
-                        "WHERE id IN (SELECT client_id FROM baby WHERE birth_date = :today)")
+    get_baby_mom = text("SELECT c.name, b.birth_date, c.tel FROM client c JOIN baby b ON c.id = b.client_id WHERE "
+                        "SUBSTRING(b.birth_date, 6, 5) = :today")
 
     clients_birthday_today = db.execute(get_baby_mom, {'today': today}).mappings().all()
 
