@@ -168,3 +168,7 @@ INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (19, '8019', '0', NULL, NULL, NULL);
 INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
 VALUES (20, '8020', '0', NULL, NULL, NULL);
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (21, '清华班', '0', NULL, NULL, NULL);
+INSERT INTO room (id, room_number, status, client_id, recently_used, notes)
+VALUES (22, '北大班', '0', NULL, NULL, NULL);
