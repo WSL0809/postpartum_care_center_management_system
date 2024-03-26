@@ -7,7 +7,7 @@ COPY . /app
 
 RUN pip install --upgrade pip --no-cache && \
     pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install --no-cache -r requirements.txt && \
+    pip install --no-cache -r requirements.txt
 
 
 EXPOSE 80
