@@ -6,7 +6,9 @@ WORKDIR /app
 COPY . /app
 
 RUN pip install --upgrade pip --no-cache && \
-    pip install --no-cache -r requirements.txt
+    pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache -r requirements.txt && \
+
 
 EXPOSE 80
 
