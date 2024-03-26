@@ -56,7 +56,21 @@ def do_get_client_in_room(db: Session, room_number: str):
         mode_of_delivery, 
         room, 
         baby_nurse.name AS assigned_baby_nurse_name,
-        STRING_AGG(baby.name, ', ') AS babies_names
+        json_agg(
+            json_build_object(
+                'name', baby.name, 
+                'birth_date', baby.birth_date, 
+                'gender', baby.gender, 
+                'birth_weight', baby.birth_weight,
+                'birth_height', baby.birth_height,
+                'health_status', baby.health_status,
+                'birth_certificate', baby.birth_certificate,
+                'remarks', baby.remarks,
+                'mom_id_number', baby.mom_id_number,
+                'dad_id_number', baby.dad_id_number,
+                'summary', baby.summary
+            )
+        ) AS babies
         FROM client 
         LEFT JOIN baby ON client.id = baby.client_id 
         LEFT JOIN meal_plan ON client.meal_plan_id = meal_plan.meal_plan_id 
