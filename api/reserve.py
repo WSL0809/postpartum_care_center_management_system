@@ -34,6 +34,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
+    meal_plan_seller: Optional[str] = None
+    recovery_plan_seller: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -49,8 +51,8 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
     # db_client = model.Client(**reserve_recv.dict())
     create_client_sql = text(
         """
-        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status)
-        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, 0)
+        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller)
+        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, 0, :meal_plan_seller, :recovery_plan_seller)
         RETURNING id
         """
     )
