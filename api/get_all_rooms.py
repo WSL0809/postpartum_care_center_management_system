@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 from starlette import status
 
 from auth import get_current_active_user
@@ -27,8 +27,8 @@ class GetAllRoomsResp(BaseModel):
     status: str
     recently_used: Union[str, None]
     notes: Union[str, None]
-    meal_plan_seller: Union[dict, None]
-    recovery_plan_seller: Union[dict, None]
+    meal_plan_seller: Union[dict, str, None]
+    recovery_plan_seller: Union[dict, str, None]
     maintenance_list: Union[dict, None]
 
 @router.get("/get_all_rooms")
