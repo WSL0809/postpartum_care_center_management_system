@@ -1,3 +1,4 @@
+import json
 from typing import Optional, Union, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,10 +20,6 @@ occupied = RoomStatus.Occupied.value
 booked = RoomStatus.Booked.value
 
 
-class Seller(BaseModel):
-    name: str
-    tel: str
-
 class ReserveRecv(BaseModel):
     id_number: str
     name: str
@@ -38,8 +35,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
-    meal_plan_seller: Union[Dict, None] = None
-    recovery_plan_seller: Union[Dict, None] = None
+    meal_plan_seller: Union[Dict, None] = {}
+    recovery_plan_seller: Union[Dict, None] = {}
 
     class Config:
         orm_mode = True
@@ -65,6 +62,8 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         UPDATE room SET status = :booked, client_id = :client_id WHERE room_number = :room;
         """
     )
+    reserve_recv["meal_plan_seller"] = json.dumps(reserve_recv.meal_plan_seller)
+    reserve_recv["recovery_plan_seller"] = json.dumps(reserve_recv.recovery_plan_seller)
     try:
         # 执行创建客户操作
         client_id = db.execute(create_client_sql, reserve_recv.dict()).fetchone()[0]
