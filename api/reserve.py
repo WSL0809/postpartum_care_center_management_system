@@ -62,11 +62,12 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         UPDATE room SET status = :booked, client_id = :client_id WHERE room_number = :room;
         """
     )
-    reserve_recv["meal_plan_seller"] = json.dumps(reserve_recv.meal_plan_seller)
-    reserve_recv["recovery_plan_seller"] = json.dumps(reserve_recv.recovery_plan_seller)
+    reserve_recv_dict = dict(reserve_recv)
+    reserve_recv_dict["meal_plan_seller"] = json.dumps(reserve_recv.meal_plan_seller)
+    reserve_recv_dict["recovery_plan_seller"] = json.dumps(reserve_recv.recovery_plan_seller)
     try:
         # 执行创建客户操作
-        client_id = db.execute(create_client_sql, reserve_recv.dict()).fetchone()[0]
+        client_id = db.execute(create_client_sql, reserve_recv_dict).fetchone()[0]
         db.flush()  # 确保客户ID可用
         # 使用新客户ID更新房间状态
         db.execute(update_room_sql,
