@@ -27,8 +27,8 @@ class GetAllRoomsResp(BaseModel):
     status: str
     recently_used: Union[str, None]
     notes: Union[str, None]
-    meal_plan_seller: Union[dict, str, None]
-    recovery_plan_seller: Union[dict, str, None]
+    meal_plan_seller: Union[Json, str, None]
+    recovery_plan_seller: Union[Json, str, None]
     maintenance_list: Union[dict, None]
 
 @router.get("/get_all_rooms")

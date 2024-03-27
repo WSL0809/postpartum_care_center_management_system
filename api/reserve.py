@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 from starlette import status
 
 import model
@@ -34,8 +34,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
-    meal_plan_seller: Union[dict, str, None] = None
-    recovery_plan_seller: Union[dict, str, None] = None
+    meal_plan_seller: Union[Json, str, None] = None
+    recovery_plan_seller: Union[Json, str, None] = None
 
     class Config:
         orm_mode = True
