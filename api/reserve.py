@@ -34,8 +34,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
-    meal_plan_seller: Union[Dict, None] = None
-    recovery_plan_seller: Union[Dict, None] = None
+    meal_plan_seller: Union[Json, None] = None
+    recovery_plan_seller: Union[Json, None] = None
 
     class Config:
         orm_mode = True
