@@ -1,4 +1,4 @@
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -34,8 +34,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
-    meal_plan_seller: Union[Json[Any], None] = None
-    recovery_plan_seller: Union[Json[Any], None] = None
+    meal_plan_seller: Union[Dict, None] = None
+    recovery_plan_seller: Union[Dict, None] = None
 
     class Config:
         orm_mode = True
