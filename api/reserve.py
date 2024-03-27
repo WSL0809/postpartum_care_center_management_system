@@ -19,6 +19,10 @@ occupied = RoomStatus.Occupied.value
 booked = RoomStatus.Booked.value
 
 
+class Seller(BaseModel):
+    name: str
+    tel: str
+
 class ReserveRecv(BaseModel):
     id_number: str
     name: str
@@ -34,8 +38,8 @@ class ReserveRecv(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse: Optional[int] = None
     room: str
-    meal_plan_seller: Union[Json, None] = None
-    recovery_plan_seller: Union[Json, None] = None
+    meal_plan_seller: Union[Dict, None] = None
+    recovery_plan_seller: Union[Dict, None] = None
 
     class Config:
         orm_mode = True
