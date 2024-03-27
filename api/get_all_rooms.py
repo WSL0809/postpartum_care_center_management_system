@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -27,8 +27,8 @@ class GetAllRoomsResp(BaseModel):
     status: str
     recently_used: Union[str, None]
     notes: Union[str, None]
-    meal_plan_seller: Union[Json, str, None]
-    recovery_plan_seller: Union[Json, str, None]
+    meal_plan_seller: Union[Dict, str, None]
+    recovery_plan_seller: Union[Dict, str, None]
     maintenance_list: Union[dict, None]
 
 @router.get("/get_all_rooms")
