@@ -13,3 +13,4 @@ rand = "0.8.0"
 [lib]
 name = "cryption"
 crate-type = ["cdylib"]
+path = "libs/lib.rs"
