@@ -5,10 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 from starlette import status
 
-import model
 from api.utils import exception_handler
 from auth import get_current_active_user
 from auth_schema import User
@@ -76,15 +75,17 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
                        "booked": booked,
                        "client_id": client_id
                    }
-                  )
+                   )
         db.commit()  # 提交事务
     except SQLAlchemyError as e:
         db.rollback()  # 发生错误时回滚事务
         print("发生错误，事务回滚:", e)
         raise e
 
+
 @router.post("/reserve")
-async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
     print(dict(reserve_recv))
     if current_user.role == "admin":
         try:
@@ -98,6 +99,7 @@ async def reserve_room(reserve_recv: ReserveRecv, current_user: User = Depends(g
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 '''
 the logic of reserve:
