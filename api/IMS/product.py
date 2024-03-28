@@ -67,3 +67,8 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 @router.get("/IMS/get_all_products", response_model=List[ProductResponse])
 async def get_all_products(db: Session = Depends(get_db)):
     return do_get_all_products(db)
+
+
+@router.post("/IMS/update_product_quantity", response_model=ProductResponse)
+async def update_product(product_id: int, quantity: int, db: Session = Depends(get_db)):
+    return update_product_quantity(db, product_id, quantity)
