@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union
+from typing import Union, List
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -51,7 +51,7 @@ def update_product_quantity(db, product_id, quantity):
     return db_product
 
 
-def get_all_products(db):
+def do_get_all_products(db):
     return db.query(model.Product).all()
 
 
@@ -64,6 +64,6 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     return db_product
 
 
-@router.get("/IMS/get_all_products")
+@router.get("/IMS/get_all_products", response_model=List[ProductResponse])
 async def get_all_products(db: Session = Depends(get_db)):
-    return get_all_products(db)
+    return do_get_all_products(db)

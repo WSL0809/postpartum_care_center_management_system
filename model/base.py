@@ -14,5 +14,3 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
     double_check_password = Column(String(255), default="88888888")
-
-    log = relationship("Log", backref="users")
