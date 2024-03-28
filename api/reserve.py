@@ -1,4 +1,6 @@
 import json
+
+from datetime import datetime
 from typing import Optional, Union, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -25,7 +27,7 @@ class ReserveRecv(BaseModel):
     tel: str
     age: int
     scheduled_date: str
-    check_in_date: str
+    check_in_date: Union[str, None] = None
     hospital_for_childbirth: str
     contact_name: str
     contact_tel: str
