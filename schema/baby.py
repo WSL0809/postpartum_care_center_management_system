@@ -1,19 +1,21 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class Baby(BaseModel):
     # client_id: int
-    name: str
-    gender: str
-    birth_date: str
-    birth_weight: str
-    birth_height: str
-    health_status: str
-    birth_certificate: str
-    remarks: str
-    mom_id_number: str
-    dad_id_number: str
-    summary: str
+    name: Optional[str] = None
+    gender: Optional[str] = None
+    birth_date: Optional[str] = None
+    birth_weight: Optional[str] = None
+    birth_height: Optional[str] = None
+    health_status: Optional[str] = None
+    birth_certificate: Optional[str] = None
+    remarks: Optional[str] = None
+    mom_id_number: Optional[str] = None
+    dad_id_number: Optional[str] = None
+    summary: Optional[str] = None
 
     class Config:
         orm_mode = True
