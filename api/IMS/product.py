@@ -4,6 +4,7 @@ from typing import Union, List, Dict
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 import model
@@ -37,8 +38,9 @@ class ProductResponse(BaseModel):
 
 class LogResponse(BaseModel):
     id: int
-    product_id: int
-    user_id: int
+    product_name: str
+    user_name: str
+    user_role: str
     operation: str
     quantity_changed: int
     timestamp: datetime
@@ -131,7 +133,18 @@ async def get_all_logs(
     page_size: int = Query(10, description="Number of items per page")
 ):
     skip = (page - 1) * page_size
-    logs = db.query(model.Log).offset(skip).limit(page_size).all()
+
+    query_log_sql = text(
+        """
+        select log.operation, log.quantity_changed, log.timestamp, 
+        p.name as product_name, u.username as user_name, u.role as user_role
+        from log
+        left join public.users u on log.user_id = u.id
+        left join public.product p on log.product_id = p.id
+        offset :skip limit :page_size
+        """
+    )
+    logs = db.execute(query_log_sql, {"skip": skip, "page_size": page_size}).mappings().all()
     logs_query = db.query(model.Log)
 
     total_items = logs_query.count()
