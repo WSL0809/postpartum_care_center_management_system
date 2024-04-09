@@ -15,6 +15,8 @@ class RoomStatus(Enum):
 class ClientStatus(Enum):
     in_there = 0
     out = 1
+    # 手动创建
+    manual_create = 2
 
 
 class BabyNurseWorkStatus(Enum):
