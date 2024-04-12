@@ -111,7 +111,7 @@ async def delete_plan(plan_recv: PlanRecv, current_user: User = Depends(get_curr
                       db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can delete plan")
-    await delete_plan(db, plan_recv)
+    delete_plan(db, plan_recv)
 
     return {
         "status": "success",
@@ -123,8 +123,8 @@ async def delete_plan(plan_recv: PlanRecv, current_user: User = Depends(get_curr
 async def get_plans(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can get plans")
-    await get_plans(db, "meal_plan")
-    await get_plans(db, "recovery_plan")
+    get_plans(db, "meal_plan")
+    get_plans(db, "recovery_plan")
     return {
         "status": "success",
         "details": "get plans success"
