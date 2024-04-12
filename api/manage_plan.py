@@ -19,6 +19,12 @@ class PlanRecvBase(BaseModel):
     duration: int
 
 
+class PlanCreate(BaseModel):
+    plan_category: str
+    details: str
+    duration: int
+
+
 class PlanRecv(PlanRecvBase):
     plan_category: str
 
@@ -31,21 +37,21 @@ class PlanResp(BaseModel):
     recovery_plan: List[PlanRecvBase]
 
 
-def create_plan(db, plan_recv):
+def create_plan_in_db(db, plan_create):
     create_plan_sql = ''
-    if plan_recv.plan_category == "meal_plan":
+    if plan_create.plan_category == "meal_plan":
         create_plan_sql = text(
             "INSERT INTO meal_plan (details, duration) VALUES (:details, :duration)"
         )
-    elif plan_recv.plan_category == "recovery_plan":
+    elif plan_create.plan_category == "recovery_plan":
         create_plan_sql = text(
             "INSERT INTO recovery_plan (details, duration) VALUES (:details, :duration)"
         )
 
-    plan_info = dict(plan_recv).copy()
+    plan_info = dict(plan_create).copy()
     plan_info.pop("plan_category", None)
     try:
-        db.execute(create_plan_sql, plan_recv)
+        db.execute(create_plan_sql, plan_create)
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()
@@ -92,14 +98,13 @@ def get_plans_in_db(db, plan_category):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 # add new plan
-@router.post("/new_plan")
-async def new_plan(plan_recv: PlanRecv, current_user: User = Depends(get_current_active_user),
+@router.post("/create_plan")
+async def create_plan(plan_create: PlanCreate, current_user: User = Depends(get_current_active_user),
                    db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can add new plan")
-    await create_plan(db, plan_recv)
+    create_plan_in_db(db, plan_create)
 
     return {
         "status": "success",
