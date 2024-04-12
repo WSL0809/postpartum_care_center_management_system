@@ -12,3 +12,4 @@ from .reminder import router as reminder_router
 from .get_client_by_room_number import router as get_client_by_room_number_router
 from .IMS.product import router as product_router
 from .insert_client import router as insert_client_router
+from .manage_plan import router as manage_plan_router

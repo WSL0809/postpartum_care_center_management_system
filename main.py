@@ -17,7 +17,8 @@ from crud import create_user, get_user
 from api import (change_room_router, reserve_router, get_all_rooms_router, check_in_router,
                  check_out_router, get_room_by_room_name_router, get_all_clients_router,
                  fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router,
-                 reminder_router, get_client_by_room_number_router, product_router, insert_client_router)
+                 reminder_router, get_client_by_room_number_router, product_router, insert_client_router,
+                 manage_plan_router)
 from fastapi.middleware.cors import CORSMiddleware
 
 model.Base.metadata.create_all(bind=engine)
@@ -37,7 +38,7 @@ app.include_router(reminder_router)
 app.include_router(get_client_by_room_number_router)
 app.include_router(product_router)
 app.include_router(insert_client_router)
-
+app.include_router(manage_plan_router)
 origins = [
     "*"
 ]

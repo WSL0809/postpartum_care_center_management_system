@@ -1,0 +1,131 @@
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+from auth import get_current_active_user
+from auth_schema import User
+from database import get_db
+
+router = APIRouter()
+
+
+class PlanRecvBase(BaseModel):
+    id: int
+    details: str
+    duration: int
+
+
+class PlanRecv(PlanRecvBase):
+    plan_category: str
+
+    class Config:
+        orm_mode = True
+
+
+def create_plan(db, plan_recv):
+    create_plan_sql = ''
+    if plan_recv.plan_category == "meal_plan":
+        create_plan_sql = text(
+            "INSERT INTO meal_plan (details, duration) VALUES (:details, :duration)"
+        )
+    elif plan_recv.plan_category == "recovery_plan":
+        create_plan_sql = text(
+            "INSERT INTO recovery_plan (details, duration) VALUES (:details, :duration)"
+        )
+
+    plan_info = dict(plan_recv).copy()
+    plan_info.pop("plan_category", None)
+    try:
+        db.execute(create_plan_sql, plan_recv)
+        db.commit()
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def delete_plan(db, plan_recv):
+    delete_plan_sql = ''
+    if plan_recv.plan_category == "meal_plan":
+        delete_plan_sql = text(
+            "DELETE FROM meal_plan WHERE meal_plan_id = :id"
+        )
+    elif plan_recv.plan_category == "recovery_plan":
+        delete_plan_sql = text(
+            "DELETE FROM recovery_plan WHERE recovery_plan_id = :id"
+        )
+
+    plan_info = dict(plan_recv).copy()
+    plan_info.pop("plan_category", None)
+    try:
+        db.execute(delete_plan_sql, plan_recv)
+        db.commit()
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def get_plans(db, plan_category):
+    get_plans_sql = ''
+    if plan_category == "meal_plan":
+        get_plans_sql = text(
+            "SELECT meal_plan_id, details, duration FROM meal_plan"
+        )
+    elif plan_category == "recovery_plan":
+        get_plans_sql = text(
+            "SELECT recovery_plan_id, details, duration FROM recovery_plan"
+        )
+
+    try:
+        db.execute(get_plans_sql)
+        db.commit()
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# add new plan
+@router.post("/new_plan")
+async def new_plan(plan_recv: PlanRecv, current_user: User = Depends(get_current_active_user),
+                   db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=401, detail="only admin can add new plan")
+    await create_plan(db, plan_recv)
+
+    return {
+        "status": "success",
+        "details": "add new plan success"
+    }
+
+
+# edit plan
+# @router.post("/edit_plan")
+# async def edit_plan():
+#     pass
+
+
+# delete plan
+@router.post("/delete_plan")
+async def delete_plan(plan_recv: PlanRecv, current_user: User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=401, detail="only admin can delete plan")
+    await delete_plan(db, plan_recv)
+
+    return {
+        "status": "success",
+        "details": "delete plan success"
+    }
+
+
+@router.get("/get_plans")
+async def get_plans(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=401, detail="only admin can get plans")
+    await get_plans(db, "meal_plan")
+    await get_plans(db, "recovery_plan")
+    return {
+        "status": "success",
+        "details": "get plans success"
+    }
