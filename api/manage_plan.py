@@ -77,11 +77,11 @@ def get_plans_in_db(db, plan_category):
     get_plans_sql = ''
     if plan_category == "meal_plan":
         get_plans_sql = text(
-            "SELECT meal_plan_id, details, duration FROM meal_plan"
+            "SELECT meal_plan_id AS id, details, duration FROM meal_plan"
         )
     elif plan_category == "recovery_plan":
         get_plans_sql = text(
-            "SELECT recovery_plan_id, details, duration FROM recovery_plan"
+            "SELECT recovery_plan_id AS id, details, duration FROM recovery_plan"
         )
 
     try:
