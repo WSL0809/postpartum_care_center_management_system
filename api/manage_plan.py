@@ -51,7 +51,7 @@ def create_plan_in_db(db, plan_create):
     plan_info = dict(plan_create).copy()
     plan_info.pop("plan_category", None)
     try:
-        db.execute(create_plan_sql, plan_create)
+        db.execute(create_plan_sql, plan_info)
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()
