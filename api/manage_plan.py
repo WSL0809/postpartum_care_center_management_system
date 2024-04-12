@@ -25,6 +25,11 @@ class PlanCreate(BaseModel):
     duration: int
 
 
+class PlanDel(BaseModel):
+    id: int
+    plan_category: str
+
+
 class PlanRecv(PlanRecvBase):
     plan_category: str
 
@@ -58,21 +63,21 @@ def create_plan_in_db(db, plan_create):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def delete_plan(db, plan_recv):
+def delete_plan_in_db(db, plan_del):
     delete_plan_sql = ''
-    if plan_recv.plan_category == "meal_plan":
+    if plan_del.plan_category == "meal_plan":
         delete_plan_sql = text(
             "DELETE FROM meal_plan WHERE meal_plan_id = :id"
         )
-    elif plan_recv.plan_category == "recovery_plan":
+    elif plan_del.plan_category == "recovery_plan":
         delete_plan_sql = text(
             "DELETE FROM recovery_plan WHERE recovery_plan_id = :id"
         )
 
-    plan_info = dict(plan_recv).copy()
+    plan_info = dict(plan_del).copy()
     plan_info.pop("plan_category", None)
     try:
-        db.execute(delete_plan_sql, plan_recv)
+        db.execute(delete_plan_sql, plan_info)
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()
@@ -101,7 +106,7 @@ def get_plans_in_db(db, plan_category):
 # add new plan
 @router.post("/create_plan")
 async def create_plan(plan_create: PlanCreate, current_user: User = Depends(get_current_active_user),
-                   db: Session = Depends(get_db)):
+                      db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can add new plan")
     create_plan_in_db(db, plan_create)
@@ -120,11 +125,11 @@ async def create_plan(plan_create: PlanCreate, current_user: User = Depends(get_
 
 # delete plan
 @router.post("/delete_plan")
-async def delete_plan(plan_recv: PlanRecv, current_user: User = Depends(get_current_active_user),
+async def delete_plan(plan_del: PlanDel, current_user: User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can delete plan")
-    delete_plan(db, plan_recv)
+    delete_plan_in_db(db, plan_del)
 
     return {
         "status": "success",
