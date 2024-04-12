@@ -82,7 +82,7 @@ def get_plans(db, plan_category):
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    return res
+    return dict(res)
 
 # add new plan
 @router.post("/new_plan")
