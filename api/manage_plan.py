@@ -78,12 +78,11 @@ def get_plans(db, plan_category):
         )
 
     try:
-        db.execute(get_plans_sql)
-        db.commit()
+        res = db.execute(get_plans_sql).mappings().all()
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-
+    return res
 
 # add new plan
 @router.post("/new_plan")
@@ -123,9 +122,11 @@ async def delete_plan(plan_recv: PlanRecv, current_user: User = Depends(get_curr
 async def get_plans(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can get plans")
-    get_plans(db, "meal_plan")
-    get_plans(db, "recovery_plan")
+    meal_plan_res = get_plans(db, "meal_plan")
+    recovery_plan_res = get_plans(db, "recovery_plan")
     return {
+        "meal_plan": meal_plan_res,
+        "recovery_plan": recovery_plan_res,
         "status": "success",
         "details": "get plans success"
     }
