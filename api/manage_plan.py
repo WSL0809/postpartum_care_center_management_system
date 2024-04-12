@@ -86,10 +86,11 @@ def get_plans(db, plan_category):
 
     try:
         res = db.execute(get_plans_sql).mappings().all()
+        return [PlanRecvBase(**dict(row)) for row in res]
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    return [PlanRecvBase(**dict(row)) for row in res]
+
 
 
 # add new plan
