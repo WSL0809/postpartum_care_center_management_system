@@ -66,7 +66,7 @@ def delete_plan(db, plan_recv):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def get_plans(db, plan_category):
+def get_plans(db, plan_category) -> list[dict]:
     get_plans_sql = ''
     if plan_category == "meal_plan":
         get_plans_sql = text(
@@ -82,7 +82,7 @@ def get_plans(db, plan_category):
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    return dict(res)
+    return [dict(row) for row in res]
 
 # add new plan
 @router.post("/new_plan")
