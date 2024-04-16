@@ -79,9 +79,9 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
                        "client_id": client_id
                    }
                    )
-        db.commit()  # 提交事务
+        db.commit()
     except SQLAlchemyError as e:
-        db.rollback()  # 发生错误时回滚事务
+        db.rollback()
         print("发生错误，事务回滚:", e)
         raise e
 
