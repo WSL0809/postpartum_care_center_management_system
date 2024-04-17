@@ -8,7 +8,7 @@ from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
 from model import Client
-from schema import ClientBase
+from schema import ClientBase, Baby
 import re
 
 router = APIRouter()
@@ -20,10 +20,33 @@ class Pagination(BaseModel):
     total: int
 
 
+class ClientGet(ClientBase):
+    id: int
+    status: Union[None, int]
+    name: str
+    tel: str
+    age: int
+    scheduled_date: str
+    check_in_date: str
+    hospital_for_childbirth: str
+    contact_name: str
+    contact_tel: str
+    babies: List[Baby]
+    meal_plan_id: int
+    recovery_plan_id: Optional[int] = None
+    mode_of_delivery: str
+    assigned_baby_nurse: Union[int, None]
+    room: Union[str, None]
+    class Config:
+        from_attributes=True
+        orm_mode = True
+
+
+
 class GetAllClientsResp(BaseModel):
     status: Union[str, int]
     details: str
-    clients: List[ClientBase]
+    clients: List[ClientGet]
     pagination: Pagination
 
 
@@ -48,11 +71,11 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     # 查询客户数据
     clients = query.offset(offset).limit(limit).all()
 
-    clients_data = [ClientBase.from_orm(client) for client in clients]
+    clients_data = [ClientGet.from_orm(client) for client in clients]
 
     # 计算总记录数
     total = query.count()
-
+    print(total)
     return total, clients_data
 
 
