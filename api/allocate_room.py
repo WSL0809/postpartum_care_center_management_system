@@ -42,7 +42,7 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
         )
     check_room_status = text(
         """
-        SELECT status FROM room WHERE id = :room
+        SELECT status FROM room WHERE room_number = :room
         """
     )
     room_status = db.execute(check_room_status, {"room": room_number}).first()
