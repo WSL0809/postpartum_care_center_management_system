@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from schedules import repeat_every
 
 import crud
 import utils
@@ -74,7 +75,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 
 def get_current_user(
-    token: str = Depends(utils.oauth2_scheme), db: Session = Depends(get_db)
+        token: str = Depends(utils.oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -105,7 +106,7 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 
 @app.post("/token")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+        form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     user = get_user(db, form_data.username)
     access_token_expires = timedelta(minutes=utils.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -135,7 +136,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.get("/get_users")
 async def get_users(
-    current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
+        current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
 ):
     if current_user.role == "admin" and current_user.is_active:
         return crud.get_users(db)
@@ -150,3 +151,9 @@ async def get_users(
 @app.get("/hello")
 async def hello():
     return {"hello"}
+
+
+@app.on_event("startup")
+@repeat_every(seconds=10)
+async def test_hello():
+    print('hello')

@@ -13,7 +13,9 @@ class RoomStatus(Enum):
 
 
 class ClientStatus(Enum):
+    # 已入住
     in_there = 0
+    # 出院
     out = 1
     # 手动创建
     manual_create = 2
