@@ -154,6 +154,6 @@ async def hello():
 
 
 @app.on_event("startup")
-@repeat_every(seconds=10)
+@repeat_every(seconds=60*60)
 async def test_hello():
     print('hello')
