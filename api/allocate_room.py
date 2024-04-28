@@ -63,7 +63,15 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
         WHERE id = :client_id
         """
     )
+    update_room_sql = text(
+        """
+        UPDATE room
+        SET status = :booked
+        WHERE room_number = :room
+        """
+    )
     db.execute(update_client_sql, {"room": room_number, "client_id": client_id})
+    db.execute(update_room_sql, {"room": room_number, "booked": RoomStatus.Occupied.value})
     db.commit()
 
     return {"status_code": status.HTTP_200_OK, "detail": "分配成功"}
