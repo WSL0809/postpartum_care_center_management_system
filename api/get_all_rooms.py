@@ -22,8 +22,10 @@ class GetAllRoomsResp(BaseModel):
     baby_nurse_name: Union[str, None]
     meal_plan_details: Union[str, None]
     meal_plan_duration: Union[int, None]
+    meal_plan_name: Union[str, None]
     recovery_plan_details: Union[str, None]
     recovery_plan_duration: Union[int, None]
+    recovery_plan_name: Union[str, None]
     status: str
     recently_used: Union[str, None]
     notes: Union[str, None]
@@ -52,6 +54,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
            meal_plan.name AS meal_plan_name,
            recovery_plan.details AS recovery_plan_details,
            recovery_plan.duration AS recovery_plan_duration,
+           recovery_plan.name AS recovery_plan_name,
            room.status AS status,
            room.recently_used AS recently_used,
            room.notes AS notes,
