@@ -102,6 +102,7 @@ class MealPlan(Base):
     meal_plan_id = Column(Integer, primary_key=True)
     details = Column(Text)
     duration = Column(Integer)
+    name = Column(String(255))
 
 
 class RecoveryPlan(Base):
@@ -109,3 +110,4 @@ class RecoveryPlan(Base):
     recovery_plan_id = Column(Integer, primary_key=True)
     details = Column(Text)
     duration = Column(Integer)
+    name = Column(String(255))

@@ -49,6 +49,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
            baby_nurse.name AS baby_nurse_name,
            meal_plan.details AS meal_plan_details,
            meal_plan.duration AS meal_plan_duration,
+           meal_plan.name AS meal_plan_name,
            recovery_plan.details AS recovery_plan_details,
            recovery_plan.duration AS recovery_plan_duration,
            room.status AS status,
