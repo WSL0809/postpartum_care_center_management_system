@@ -48,11 +48,11 @@ def create_plan_in_db(db, plan_create):
     create_plan_sql = ''
     if plan_create.plan_category == "meal_plan":
         create_plan_sql = text(
-            "INSERT INTO meal_plan (details, duration) VALUES (:details, :duration)"
+            "INSERT INTO meal_plan (details, duration, name) VALUES (:details, :duration, :name)"
         )
     elif plan_create.plan_category == "recovery_plan":
         create_plan_sql = text(
-            "INSERT INTO recovery_plan (details, duration) VALUES (:details, :duration)"
+            "INSERT INTO recovery_plan (details, duration, name) VALUES (:details, :duration, :name)"
         )
 
     plan_info = dict(plan_create).copy()
