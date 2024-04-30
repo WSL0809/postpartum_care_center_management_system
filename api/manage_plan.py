@@ -22,8 +22,8 @@ class PlanRecvBase(BaseModel):
 
 class PlanCreate(BaseModel):
     plan_category: str
-    name: str
-    details: str
+    name: str = 'none'
+    details: str = 'none'
     duration: int
 
 
