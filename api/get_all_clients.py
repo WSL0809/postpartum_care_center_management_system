@@ -37,6 +37,7 @@ class ClientGet(ClientBase):
     mode_of_delivery: str
     assigned_baby_nurse: Union[int, None]
     room: Union[str, None]
+    due_date: Union[str, None]
     class Config:
         from_attributes=True
         orm_mode = True

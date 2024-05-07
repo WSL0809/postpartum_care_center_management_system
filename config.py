@@ -13,9 +13,9 @@ class RoomStatus(Enum):
 
 
 class ClientStatus(Enum):
-    # 已入住
+    # 直接从房态管理里添加的顾客（房态显示已预定） *vip客户*
     in_there = 0
-    # 出院
+    # 住完已经离开月子中心的顾客
     out = 1
     # 手动创建
     manual_create = 2
