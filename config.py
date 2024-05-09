@@ -18,7 +18,7 @@ class ClientStatus(Enum):
     # 住完已经离开月子中心的顾客
     out = 1
     # 手动创建
-    manual_create = 2
+    manual_create_without_room = 2
 
 
 class BabyNurseWorkStatus(Enum):

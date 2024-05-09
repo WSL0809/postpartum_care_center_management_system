@@ -67,7 +67,7 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
-    reserve_recv_dict["status"] = ClientStatus.manual_create.value
+    reserve_recv_dict["status"] = ClientStatus.manual_create_without_room.value
     try:
         db.execute(create_client_sql, reserve_recv_dict)
         db.flush()
