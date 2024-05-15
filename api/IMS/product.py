@@ -141,6 +141,7 @@ async def get_all_logs(
         from log
         left join public.users u on log.user_id = u.id
         left join public.product p on log.product_id = p.id
+        order by log.timestamp desc
         offset :skip limit :page_size
         """
     )
