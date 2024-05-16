@@ -20,7 +20,7 @@ class ClientResp(BaseModel):
     tel: str
     age: int
     scheduled_date: str
-    check_in_date: str
+    check_in_date: Union[str, None]
     hospital_for_childbirth: str
     contact_name: str
     contact_tel: str
