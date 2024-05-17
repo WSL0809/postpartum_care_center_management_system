@@ -1,9 +1,10 @@
+import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 
 from auth import get_current_active_user
@@ -11,7 +12,7 @@ from auth_schema import User
 from database import get_db
 
 router = APIRouter()
-
+logger = logging.getLogger(__name__)
 
 class PlanRecvBase(BaseModel):
     id: int
@@ -25,7 +26,7 @@ class PlanCreate(BaseModel):
     plan_category: str
     name: str = 'none'
     details: str = 'none'
-    duration: int
+    duration: int = 0
     price: float
 
 
@@ -83,9 +84,18 @@ def delete_plan_in_db(db, plan_del):
     try:
         db.execute(delete_plan_sql, plan_info)
         db.commit()
-    except SQLAlchemyError as e:
+    except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Database error occurred: {e}")
+        if "ForeignKeyViolation" in str(e.orig):
+            raise HTTPException(status_code=400, detail="套餐正被使用")
+        else:
+            raise HTTPException(status_code=500, detail="Database operation failed")
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Unhandled exception: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
 
 def get_plans_in_db(db, plan_category):
