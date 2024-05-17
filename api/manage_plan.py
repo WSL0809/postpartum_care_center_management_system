@@ -18,6 +18,7 @@ class PlanRecvBase(BaseModel):
     name: str
     details: str
     duration: int
+    price: float
 
 
 class PlanCreate(BaseModel):
@@ -25,6 +26,7 @@ class PlanCreate(BaseModel):
     name: str = 'none'
     details: str = 'none'
     duration: int
+    price: float
 
 
 class PlanDel(BaseModel):
@@ -48,11 +50,11 @@ def create_plan_in_db(db, plan_create):
     create_plan_sql = ''
     if plan_create.plan_category == "meal_plan":
         create_plan_sql = text(
-            "INSERT INTO meal_plan (details, duration, name) VALUES (:details, :duration, :name)"
+            "INSERT INTO meal_plan (details, duration, name, price) VALUES (:details, :duration, :name, :price)"
         )
     elif plan_create.plan_category == "recovery_plan":
         create_plan_sql = text(
-            "INSERT INTO recovery_plan (details, duration, name) VALUES (:details, :duration, :name)"
+            "INSERT INTO recovery_plan (details, duration, name, price) VALUES (:details, :duration, :name, :price)"
         )
 
     plan_info = dict(plan_create).copy()
@@ -90,11 +92,11 @@ def get_plans_in_db(db, plan_category):
     get_plans_sql = ''
     if plan_category == "meal_plan":
         get_plans_sql = text(
-            "SELECT meal_plan_id AS id, details, duration, name FROM meal_plan"
+            "SELECT meal_plan_id AS id, details, duration, name, price FROM meal_plan"
         )
     elif plan_category == "recovery_plan":
         get_plans_sql = text(
-            "SELECT recovery_plan_id AS id, details, duration, name FROM recovery_plan"
+            "SELECT recovery_plan_id AS id, details, duration, name, price FROM recovery_plan"
         )
 
     try:

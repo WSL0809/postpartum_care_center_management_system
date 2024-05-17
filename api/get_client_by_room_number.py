@@ -25,8 +25,8 @@ class ClientResp(BaseModel):
     contact_name: str
     contact_tel: str
     babies: List[Baby]
-    meal_plan_details: str
-    recovery_plan_details: Optional[str] = None
+    meal_plan_id: int
+    recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
     assigned_baby_nurse_name: Union[str, None]
     room: Union[str, None]
@@ -51,8 +51,8 @@ def do_get_client_in_room(db: Session, room_number: str):
         client.hospital_for_childbirth, 
         client.contact_name, 
         client.contact_tel, 
-        meal_plan.details AS meal_plan_details, 
-        recovery_plan.details AS recovery_plan_details, 
+        meal_plan.meal_plan_id AS meal_plan_id, 
+        recovery_plan.recovery_plan_id AS recovery_plan_id, 
         mode_of_delivery, 
         room, 
         baby_nurse.name AS assigned_baby_nurse_name,
