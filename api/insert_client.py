@@ -55,15 +55,6 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
         """
     )
 
-    try:
-        if insert_client_recv.room is not None:
-            room_status = db.execute(check_room_status_sql, {"room": insert_client_recv.room}).fetchone()[0]
-            if room_status == occupied:
-                raise HTTPException(status_code=400, detail="room occupied")
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=f"检查房间{insert_client_recv.room}是否存在,ERROR: {e}")
-
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
