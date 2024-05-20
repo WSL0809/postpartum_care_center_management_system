@@ -10,11 +10,12 @@ from starlette import status
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from config import RoomStatus, BabyNurseWorkStatus
+from config import RoomStatus, BabyNurseWorkStatus, ClientTag
 
 router = APIRouter()
 free = RoomStatus.Free.value
 occupied = RoomStatus.Occupied.value
+booked = RoomStatus.Booked.value
 working = BabyNurseWorkStatus.working.value
 
 class BabyRecv(BaseModel):
@@ -44,6 +45,20 @@ class CheckInResp(BaseModel):
 
 
 def update_room_and_baby(db, check_in_recv: CheckInRecv):
+    get_client_status_sql = text(
+        """
+        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
+        """
+    )
+    client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number}).first()
+    update_client_status_sql = text(
+        """
+        UPDATE client SET status = :status
+        WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
+        """
+    )
+    db.execute(update_client_status_sql, {"status": ClientTag.checked_in.value, "room_number": check_in_recv.room_number})
+
     update_room_sql = text(
         """
         UPDATE room SET status = :occupied
@@ -66,7 +81,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
     )
     update_client_sql = text(
         """
-        UPDATE client SET check_in_date = :check_in_date, assigned_baby_nurse = (SELECT baby_nurse_id AS assigned_baby_nurse FROM baby_nurse WHERE name = :assigned_baby_nurse_name)
+        UPDATE client SET status = :status ,check_in_date = :check_in_date, assigned_baby_nurse = (SELECT baby_nurse_id AS assigned_baby_nurse FROM baby_nurse WHERE name = :assigned_baby_nurse_name)
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
     )
