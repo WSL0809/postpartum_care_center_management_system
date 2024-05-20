@@ -47,17 +47,17 @@ class CheckInResp(BaseModel):
 def update_room_and_baby(db, check_in_recv: CheckInRecv):
     get_client_status_sql = text(
         """
-        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
+        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :status)
         """
     )
-    client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number}).first()
+    client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number, "status": booked}).first()
     update_client_status_sql = text(
         """
         UPDATE client SET status = :status
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
         """
     )
-    db.execute(update_client_status_sql, {"status": ClientTag.checked_in.value, "room_number": check_in_recv.room_number})
+    db.execute(update_client_status_sql, {"status": f'{client_status.split("-")[0]}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number})
 
     update_room_sql = text(
         """
