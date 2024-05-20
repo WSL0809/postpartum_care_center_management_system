@@ -23,13 +23,14 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
         )
 
     client = db.query(Client).filter(Client.id == client_id).first()
+    client_status = client.status.split("-")[1]
     if client is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Client not found",
         )
 
-    if client.status.split("-")[1] == ClientTag.wait_for_room.value:
+    if client_status == ClientTag.wait_for_room.value:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="此用户并非等待分配的用户，无法分配房间",
@@ -59,7 +60,7 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
     update_client_sql = text(
         """
         UPDATE client
-        SET room = :room
+        SET room = :room, status = :status
         WHERE id = :client_id
         """
     )
@@ -70,7 +71,7 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
         WHERE room_number = :room
         """
     )
-    db.execute(update_client_sql, {"room": room_number, "client_id": client_id})
+    db.execute(update_client_sql, {"room": room_number, "client_id": client_id, "status": ClientTag.reversed_room.value})
     db.execute(update_room_sql, {"room": room_number, "booked": RoomStatus.Booked.value, "client_id": client_id})
     db.commit()
 

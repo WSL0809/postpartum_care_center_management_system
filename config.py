@@ -23,6 +23,7 @@ class ClientStatus(Enum):
 class ClientTag(Enum):
     create_in_room_page = '1'
     wait_for_room = '2'
+    reversed_room = '3'
 
 
 class BabyNurseWorkStatus(Enum):
