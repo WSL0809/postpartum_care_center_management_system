@@ -44,13 +44,15 @@ def update_room_and_client(db, check_out_recv):
         """
     )
     # client.status.split("-")[1] = ClientTag.checked_out
+
     update_client_sql = text(
         """
         UPDATE client
         SET status = 
             substring(status from 1 for position('-' in status) - 1) || '-' || 
             :new_status_part || 
-            coalesce(substring(status from position('-' in status) + 1 + length(substring(status from position('-' in status) + 1, '-'))), ''),
+            '-' || 
+            substring(status from position('-' in status) + 1 + position('-' in substring(status from position('-' in status) + 1))),
             room = NULL
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
