@@ -49,10 +49,8 @@ def update_room_and_client(db, check_out_recv):
         """
         UPDATE client
         SET status = 
-            substring(status from 1 for position('-' in status) - 1) || '-' || 
-            :new_status_part || 
-            '-' || 
-            substring(status from position('-' in status) + 1 + position('-' in substring(status from position('-' in status) + 1))),
+            substring(status from 1 for position('-' in status)) || '-' || 
+            :new_status_part,
             room = NULL
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
