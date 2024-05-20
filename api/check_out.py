@@ -15,7 +15,7 @@ from starlette import status
 
 from auth import get_current_active_user, roles_required
 from auth_schema import User
-from config import RoomStatus, ClientStatus, BabyNurseWorkStatus
+from config import RoomStatus, ClientStatus, BabyNurseWorkStatus, ClientTag
 from database import get_db
 from datetime import datetime
 standby = BabyNurseWorkStatus.standby.value
@@ -43,10 +43,16 @@ def update_room_and_client(db, check_out_recv):
         WHERE room_number = :room_number
         """
     )
-
+    # client.status.split("-")[1] = ClientTag.checked_out
     update_client_sql = text(
         """
-        UPDATE client SET status = :status, room = NULL WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
+        UPDATE client
+        SET status = 
+            substring(status from 1 for position('-' in status) - 1) || '-' || 
+            :new_status_part || 
+            coalesce(substring(status from position('-' in status) + 1 + length(substring(status from position('-' in status) + 1, '-'))), ''),
+            room = NULL
+        WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
     )
 
@@ -57,7 +63,7 @@ def update_room_and_client(db, check_out_recv):
     )
 
     try:
-        db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
+        db.execute(update_client_sql, {"new_status_part": ClientTag.checked_out.value, "room_number": check_out_recv.room_number})
         db.execute(update_room_sql,
                    {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
                     "status": free})
