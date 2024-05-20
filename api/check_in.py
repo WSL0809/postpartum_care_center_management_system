@@ -57,7 +57,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
         """
     )
-    db.execute(update_client_status_sql, {"status": f'{client_status.split("-")[0]}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number})
+    db.execute(update_client_status_sql, {"status": f'{client_status["status"].split("-")[0]}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number})
 
     update_room_sql = text(
         """
