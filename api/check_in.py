@@ -47,10 +47,10 @@ class CheckInResp(BaseModel):
 def update_room_and_baby(db, check_in_recv: CheckInRecv):
     get_client_status_sql = text(
         """
-        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :status)
+        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
         """
     )
-    client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number, "status": status}).mappings().first()
+    client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number, "booked": booked}).mappings().first()
     client_status = client_status["status"].split("-")[0]
     update_client_status_sql = text(
         """
