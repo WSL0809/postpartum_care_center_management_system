@@ -22,7 +22,7 @@ class Pagination(BaseModel):
 
 class ClientGet(ClientBase):
     id: int
-    status: Union[None, int]
+    status: Union[None, str]
     name: str
     tel: str
     age: int
