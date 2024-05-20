@@ -60,7 +60,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
            room.notes AS notes,
            room.fault_list AS maintenance_list
         FROM room
-        LEFT JOIN client ON room.client_id = client.id AND client.status <> 1
+        LEFT JOIN client ON room.client_id = client.id AND client.status <> '1'
         LEFT JOIN meal_plan ON client.meal_plan_id = meal_plan.meal_plan_id
         LEFT JOIN recovery_plan ON client.recovery_plan_id = recovery_plan.recovery_plan_id
         LEFT JOIN baby_nurse ON client.assigned_baby_nurse = baby_nurse.baby_nurse_id
