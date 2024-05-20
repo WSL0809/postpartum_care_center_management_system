@@ -71,7 +71,7 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
         WHERE room_number = :room
         """
     )
-    db.execute(update_client_sql, {"room": room_number, "client_id": client_id, "status": f'{client_status}-{ClientTag.reversed_room.value}'})
+    db.execute(update_client_sql, {"room": room_number, "client_id": client_id, "status": f'{client.status.split("-")[0]}-{ClientTag.reversed_room.value}'})
     db.execute(update_room_sql, {"room": room_number, "booked": RoomStatus.Booked.value, "client_id": client_id})
     db.commit()
 
