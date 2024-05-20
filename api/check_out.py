@@ -44,13 +44,18 @@ def update_room_and_client(db, check_out_recv):
         """
     )
     # client.status.split("-")[1] = ClientTag.checked_out
-
+    get_client_status_sql = text(
+        """
+        SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
+        """
+    )
+    client_status = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
+    client_status = client_status.mappings().first()
+    client_status = client_status["status"].split("-")[0]
     update_client_sql = text(
         """
         UPDATE client
-        SET status = 
-            substring(status from 1 for position('-' in status)) || '-' || 
-            :new_status_part,
+        SET status = :status,
             room = NULL
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
@@ -63,7 +68,7 @@ def update_room_and_client(db, check_out_recv):
     )
 
     try:
-        db.execute(update_client_sql, {"new_status_part": ClientTag.checked_out.value, "room_number": check_out_recv.room_number})
+        db.execute(update_client_sql, {"status": f'{client_status}-{ClientTag.terminate.value}', "room_number": check_out_recv.room_number})
         db.execute(update_room_sql,
                    {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
                     "status": free})
