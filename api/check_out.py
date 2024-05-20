@@ -13,13 +13,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette import status
 
-from auth import get_current_active_user
+from auth import get_current_active_user, roles_required
 from auth_schema import User
 from config import RoomStatus, ClientStatus, BabyNurseWorkStatus
 from database import get_db
 from datetime import datetime
 standby = BabyNurseWorkStatus.standby.value
-
 
 router = APIRouter()
 
@@ -59,7 +58,9 @@ def update_room_and_client(db, check_out_recv):
 
     try:
         db.execute(update_client_sql, {"status": ClientStatus.out.value, "room_number": check_out_recv.room_number})
-        db.execute(update_room_sql, {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'), "status": free})
+        db.execute(update_room_sql,
+                   {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
+                    "status": free})
         db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
         db.commit()
     except ValueError as ve:
@@ -71,11 +72,10 @@ def update_room_and_client(db, check_out_recv):
         raise Exception(str(e))
 
 
-@router.post("/check_out")
-async def check_out_room(check_out_recv: CheckOutRecv, current_user: User = Depends(get_current_active_user),  db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        return CheckOutResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
-
+@router.post("/terminate")
+@roles_required("admin")
+async def terminate_service(check_out_recv: CheckOutRecv, current_user: User = Depends(get_current_active_user),
+                            db: Session = Depends(get_db)):
     if current_user.double_check_password != check_out_recv.double_check_password:
         return CheckOutResp(status=status.HTTP_401_UNAUTHORIZED, details="密码错误")
 

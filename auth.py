@@ -1,12 +1,24 @@
-from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
-from starlette import status
 
 import model
 import utils
 from auth_schema import TokenData, User
 from database import get_db
+
+from functools import wraps
+from fastapi import Depends, HTTPException, status
+
+
+def roles_required(*required_roles):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db), **kwargs):
+            if current_user.role not in required_roles:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="权限不足")
+            return await func(*args, current_user=current_user, db=db, **kwargs)
+        return wrapper
+    return decorator
 
 
 def get_user(db: Session, user_name: str):
