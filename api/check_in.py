@@ -52,13 +52,13 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
     )
     client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number, "booked": booked}).mappings().first()
     client_status = client_status["status"].split("-")[0]
-    update_client_status_sql = text(
-        """
-        UPDATE client SET status = :status
-        WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
-        """
-    )
-    db.execute(update_client_status_sql, {"status": f'{client_status}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number, "booked": booked})
+    # update_client_status_sql = text(
+    #     """
+    #     UPDATE client SET status = :status
+    #     WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
+    #     """
+    # )
+    # db.execute(update_client_status_sql, {"status": f'{client_status}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number, "booked": booked})
 
     update_room_sql = text(
         """
@@ -101,7 +101,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         baby_data = dict(check_in_recv.baby)
         baby_data["room_number"] = check_in_recv.room_number
         db.execute(update_baby_sql, baby_data)
-        db.execute(update_client_sql, {"room_number": check_in_recv.room_number, "check_in_date": check_in_recv.check_in_date, "assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name})
+        db.execute(update_client_sql, {"room_number": check_in_recv.room_number, "check_in_date": check_in_recv.check_in_date, "assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name, "status": f'{client_status}-{ClientTag.checked_in.value}'})
         db.execute(update_baby_nurse_work_status_sql, {"assigned_baby_nurse_name": check_in_recv.assigned_baby_nurse_name, "working": working})
         db.commit()
     except SQLAlchemyError as e:
