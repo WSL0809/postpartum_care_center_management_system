@@ -42,25 +42,40 @@ class InsertClientRecv(BaseModel):
 
 
 def update_client_and_room(db, insert_client_recv: InsertClientRecv):
-    create_client_sql = text(
-        """
-        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
-        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
-        """
-    )
+
 
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
     reserve_recv_dict["status"] = f'{reserve_recv_dict["status"]}{ClientTag.wait_for_room.value}'
-    try:
-        db.execute(create_client_sql, reserve_recv_dict)
-        db.flush()
-        db.commit()
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=f"检查房间{insert_client_recv.room}是否存在, ERROR: {e}")
-
+    if insert_client_recv.room:
+        try:
+            create_client_sql = text(
+                """
+                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
+                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
+                """
+            )
+            db.execute(create_client_sql, reserve_recv_dict)
+            db.flush()
+            db.commit()
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=f"检查房间{insert_client_recv.room}是否存在, ERROR: {e}")
+    else:
+        try:
+            create_client_sql_without_room = text(
+                """
+                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
+                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
+                """
+            )
+            db.execute(create_client_sql_without_room, reserve_recv_dict)
+            db.flush()
+            db.commit()
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=f"ERROR: {e}")
 
 @router.post("/insert_client")
 async def insert_client(insert_client_recv: InsertClientRecv, current_user: User = Depends(get_current_active_user),
