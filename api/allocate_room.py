@@ -5,7 +5,7 @@ from starlette import status
 
 from auth import get_current_active_user
 from auth_schema import User
-from config import ClientStatus, RoomStatus
+from config import ClientStatus, RoomStatus, ClientTag
 from database import get_db
 from model import Client
 
@@ -29,10 +29,10 @@ async def allocate_room_by_client_id(client_id: int, room_number: str, current_u
             detail="Client not found",
         )
 
-    if client.status != ClientStatus.manual_create_without_room.value:
+    if client.status.split("-")[1] == ClientTag.wait_for_room.value:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="此用户并非手动添加，无法分配房间",
+            detail="此用户并非等待分配的用户，无法分配房间",
         )
 
     if client.room is not None:

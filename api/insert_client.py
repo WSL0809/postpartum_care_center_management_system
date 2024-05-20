@@ -47,7 +47,7 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
-    reserve_recv_dict["status"] = f'{reserve_recv_dict["status"]}{ClientTag.wait_for_room.value}'
+    reserve_recv_dict["status"] = f'{reserve_recv_dict["status"]}-{ClientTag.wait_for_room.value}'
     if insert_client_recv.room:
         try:
             create_client_sql = text(
