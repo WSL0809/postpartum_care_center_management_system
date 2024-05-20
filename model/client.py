@@ -23,7 +23,7 @@ class Client(Base):
     mode_of_delivery = Column(String(255))
     room = Column(String(255), ForeignKey("room.room_number"))
     id_number = Column(String(255), unique=True)
-    status = Column(Integer, default=0)
+    status = Column(String(255), default="none")
     meal_plan_seller = Column(JSONB)
     recovery_plan_seller = Column(JSONB)
     due_date = Column(String(255))

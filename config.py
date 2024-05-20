@@ -20,6 +20,9 @@ class ClientStatus(Enum):
     # 手动创建
     manual_create_without_room = 2
 
+class ClientTag(Enum):
+    wait_for_room = '2'
+
 
 class BabyNurseWorkStatus(Enum):
     # 工作中

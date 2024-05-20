@@ -1,7 +1,6 @@
 import json
 
-from datetime import datetime
-from typing import Optional, Union, Any, Dict
+from typing import Optional, Union, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -12,7 +11,7 @@ from pydantic import BaseModel
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from config import ClientStatus, RoomStatus
+from config import RoomStatus, ClientTag
 
 router = APIRouter()
 
@@ -37,17 +36,12 @@ class InsertClientRecv(BaseModel):
     meal_plan_seller: Union[Dict, None] = {}
     recovery_plan_seller: Union[Dict, None] = {}
     due_date: Union[str, None] = None
-    status: int
+    status: str
     class Config:
         orm_mode = True
 
 
 def update_client_and_room(db, insert_client_recv: InsertClientRecv):
-    check_room_status_sql = text(
-        """
-        SELECT status FROM room WHERE id = :room
-        """
-    )
     create_client_sql = text(
         """
         INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
@@ -58,7 +52,7 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
-    # reserve_recv_dict["status"] = ClientStatus.manual_create_without_room.value
+    reserve_recv_dict["status"] = f'{reserve_recv_dict["status"]}{ClientTag.wait_for_room.value}'
     try:
         db.execute(create_client_sql, reserve_recv_dict)
         db.flush()
