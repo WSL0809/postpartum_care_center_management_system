@@ -51,13 +51,14 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
         """
     )
     client_status = db.execute(get_client_status_sql, {"room_number": check_in_recv.room_number, "status": status}).mappings().first()
+    client_status = client_status["status"].split("-")[0]
     update_client_status_sql = text(
         """
         UPDATE client SET status = :status
         WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number AND status = :booked)
         """
     )
-    db.execute(update_client_status_sql, {"status": f'{client_status["status"].split("-")[0]}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number, "booked": booked})
+    db.execute(update_client_status_sql, {"status": f'{client_status}-{ClientTag.checked_in.value}', "room_number": check_in_recv.room_number, "booked": booked})
 
     update_room_sql = text(
         """
