@@ -37,13 +37,14 @@ class CheckOutResp(BaseModel):
 
 
 def update_room_and_client(db, check_out_recv):
+    # 把房间状态改为空闲，房间客户改为空，最近使用改为今天
     update_room_sql = text(
         """
         UPDATE room SET status = :status, client_id = NULL, recently_used = :recently_used
         WHERE room_number = :room_number
         """
     )
-    # client.status.split("-")[1] = ClientTag.checked_out
+
     get_client_status_sql = text(
         """
         SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
@@ -52,6 +53,7 @@ def update_room_and_client(db, check_out_recv):
     client_status = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
     client_status = client_status.mappings().first()
     client_status = client_status["status"].split("-")[0]
+    # 把客户状态改为已离店，客户房间改为空
     update_client_sql = text(
         """
         UPDATE client
@@ -61,6 +63,7 @@ def update_room_and_client(db, check_out_recv):
         """
     )
 
+    # 把宝妈护工状态改为待命
     update_baby_nurse_work_status_sql = text(
         """
         UPDATE baby_nurse SET work_status = :standby WHERE baby_nurse_id = (SELECT assigned_baby_nurse FROM client WHERE room = :room_number)
@@ -90,6 +93,15 @@ async def terminate_service(check_out_recv: CheckOutRecv, current_user: User = D
     if current_user.double_check_password != check_out_recv.double_check_password:
         return CheckOutResp(status=status.HTTP_401_UNAUTHORIZED, details="密码错误")
 
+    try:
+        update_room_and_client(db, check_out_recv)
+        return CheckOutResp(status=status.HTTP_200_OK, details="强制退房成功")
+    except Exception as e:
+        return CheckOutResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=str(e))
+
+@router.post("/check_out")
+@roles_required("admin")
+async def terminate_service(check_out_recv: CheckOutRecv, db: Session = Depends(get_db)):
     try:
         update_room_and_client(db, check_out_recv)
         return CheckOutResp(status=status.HTTP_200_OK, details="退房成功")
