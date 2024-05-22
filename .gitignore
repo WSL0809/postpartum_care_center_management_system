@@ -12,3 +12,4 @@ schema/.DS_Store
 .idea/.DS_Store
 /target
 Cargo.lock
+/.idea

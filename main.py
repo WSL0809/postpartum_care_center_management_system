@@ -15,7 +15,7 @@ from auth_schema import UserCreate, User, TokenData
 import model
 from database import engine, SessionLocal
 from utils import verify_password
-from crud import create_user, get_user
+from crud import create_user, get_user, is_user_exits
 from api import (change_room_router, reserve_router, get_all_rooms_router, check_in_router,
                  check_out_router, get_room_by_room_name_router, get_all_clients_router,
                  fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router,
@@ -127,7 +127,7 @@ async def login_for_access_token(
 
 @app.post("/register", response_model=User)
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user(db, user.username)
+    db_user = is_user_exits(db, user.username)
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
