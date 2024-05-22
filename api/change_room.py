@@ -33,7 +33,7 @@ class ChangeRoomResp(BaseModel):
 
 @exception_handler
 def update_client_and_room(
-        db, old_room_number: str, new_room_number: str, client_name: str
+    db, old_room_number: str, new_room_number: str, client_name: str
 ):
     """
     Update the room number for a client in the database.
@@ -88,12 +88,19 @@ def get_room_status(db, room_number: str):
 
 
 @router.post("/change_room", response_model=ChangeRoomResp)
-async def change_room(change_room_recv: ChangeRoomRecv, current_user: User = Depends(get_current_active_user),
-                      db: Session = Depends(get_db)):
+async def change_room(
+    change_room_recv: ChangeRoomRecv,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
     if current_user.role != "admin":
-        return ChangeRoomResp(status=status.HTTP_401_UNAUTHORIZED, details="没有访问权限")
-    if get_room_status(db, change_room_recv.old_room_number) == occupied and get_room_status(db,
-                                                                                             change_room_recv.new_room_number) == free:
+        return ChangeRoomResp(
+            status=status.HTTP_401_UNAUTHORIZED, details="没有访问权限"
+        )
+    if (
+        get_room_status(db, change_room_recv.old_room_number) == occupied
+        and get_room_status(db, change_room_recv.new_room_number) == free
+    ):
         try:
             update_client_and_room(
                 db,
@@ -103,6 +110,11 @@ async def change_room(change_room_recv: ChangeRoomRecv, current_user: User = Dep
             )
             return ChangeRoomResp(status=status.HTTP_200_OK, details="完成")
         except SQLAlchemyError as e:
-            return ChangeRoomResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=f'数据库发生错误: {e}')
+            return ChangeRoomResp(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                details=f"数据库发生错误: {e}",
+            )
     else:
-        return ChangeRoomResp(status=status.HTTP_400_BAD_REQUEST, details="不符合换房要求")
+        return ChangeRoomResp(
+            status=status.HTTP_400_BAD_REQUEST, details="不符合换房要求"
+        )
