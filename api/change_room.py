@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette import status
 
-from auth import get_current_active_user
+from auth import get_current_active_user, roles_required
 from auth_schema import User
 from database import get_db
 from config import RoomStatus
@@ -23,7 +23,7 @@ occupied = RoomStatus.Occupied.value
 class ChangeRoomRecv(BaseModel):
     old_room_number: str
     new_room_number: str
-    client_name: str
+    client_id: int
 
 
 class ChangeRoomResp(BaseModel):
@@ -88,15 +88,11 @@ def get_room_status(db, room_number: str):
 
 
 @router.post("/change_room", response_model=ChangeRoomResp)
+@roles_required("admin")
 async def change_room(
     change_room_recv: ChangeRoomRecv,
-    current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    if current_user.role != "admin":
-        return ChangeRoomResp(
-            status=status.HTTP_401_UNAUTHORIZED, details="没有访问权限"
-        )
     if (
         get_room_status(db, change_room_recv.old_room_number) == occupied
         and get_room_status(db, change_room_recv.new_room_number) == free
