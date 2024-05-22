@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from auth import roles_required
+from auth import roles_required, get_current_active_user
+from auth_schema import User
 from model import Room
 from database import get_db
 from pydantic import BaseModel
@@ -26,7 +27,7 @@ class AddRoomResp(BaseModel):
 
 @router.post("/add_room", response_model=AddRoomResp)
 @roles_required("admin")
-async def add_room(room_info: AddRoomRecv, db: Session = Depends(get_db)):
+async def add_room(room_info: AddRoomRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     try:
         room = Room(room_number=room_info.room_number, notes=room_info.notes)
         db.add(room)
