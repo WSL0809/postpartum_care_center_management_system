@@ -16,3 +16,4 @@ from .manage_plan import router as manage_plan_router
 from .allocate_room import router as allocate_room_router
 from .get_plan_by_id import router as get_plan_by_id_router
 from .update_client_status import router as update_client_status_router
+from .room import router as room_router

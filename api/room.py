@@ -16,6 +16,8 @@ class AddRoomRecv(BaseModel):
     room_number: str
     notes: Union[str, None]
 
+class DeleteRoomRecv(BaseModel):
+    room_number: str
 
 class AddRoomResp(BaseModel):
     msg: str
@@ -31,6 +33,20 @@ async def add_room(room_info: AddRoomRecv, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(room)
         return AddRoomResp(msg="Room added successfully", success=True)
+    except SQLAlchemyError as e:
+        db.rollback()
+        return AddRoomResp(msg=f"Database error: {str(e)}", success=False)
+    except Exception as e:
+        return AddRoomResp(msg=f"Unexpected error: {str(e)}", success=False)
+
+
+@router.post("/delete_room")
+@roles_required("admin")
+async def delete_room(room: DeleteRoomRecv, db: Session = Depends(get_db)):
+    try:
+        db.query(Room).filter(Room.room_number == room.room_number).delete()
+        db.commit()
+        return AddRoomResp(msg="Room deleted successfully", success=True)
     except SQLAlchemyError as e:
         db.rollback()
         return AddRoomResp(msg=f"Database error: {str(e)}", success=False)

@@ -20,7 +20,8 @@ from api import (change_room_router, reserve_router, get_all_rooms_router, check
                  check_out_router, get_room_by_room_name_router, get_all_clients_router,
                  fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router,
                  reminder_router, get_client_by_room_number_router, product_router, insert_client_router,
-                 manage_plan_router, allocate_room_router, get_plan_by_id_router, update_client_status_router)
+                 manage_plan_router, allocate_room_router, get_plan_by_id_router, update_client_status_router,
+                 room_router)
 from fastapi.middleware.cors import CORSMiddleware
 
 model.Base.metadata.create_all(bind=engine)
@@ -44,6 +45,7 @@ app.include_router(manage_plan_router)
 app.include_router(allocate_room_router)
 app.include_router(get_plan_by_id_router)
 app.include_router(update_client_status_router)
+app.include_router(room_router)
 origins = [
     "*"
 ]
