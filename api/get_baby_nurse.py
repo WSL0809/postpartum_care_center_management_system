@@ -19,7 +19,7 @@ router = APIRouter()
 class BabyNurseModel(BaseModel):
     baby_nurse_id: Optional[int] = None
     name: Optional[str] = None
-    age: Optional[str] = None
+    age: Union[None, int] = None
     tel: Optional[str] = None
     address: Optional[str] = None
     id_number: Optional[str] = None
