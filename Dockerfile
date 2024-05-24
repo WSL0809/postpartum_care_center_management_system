@@ -11,4 +11,4 @@ RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && 
 
 EXPOSE 80
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--workers", "2"]
+CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "20245", "--workers", "4"]
