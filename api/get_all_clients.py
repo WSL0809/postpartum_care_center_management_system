@@ -118,7 +118,7 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
 
     try:
         # 执行查询
-        clients = db.execute(text(full_query), params).fetchall()
+        clients = db.execute(text(full_query), params).mappings().all()
 
         # 计算总数
         total = db.execute(text(count_query), {'name': f'%{name}%'} if name else {}).scalar()
