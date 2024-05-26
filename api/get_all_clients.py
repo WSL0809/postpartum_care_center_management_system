@@ -32,7 +32,7 @@ class ClientGet(BaseModel):
     hospital_for_childbirth: str
     contact_name: str
     contact_tel: str
-    babies: List[Baby]
+    babies: Union[List[Baby], None] = []
     meal_plan_id: int
     recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
