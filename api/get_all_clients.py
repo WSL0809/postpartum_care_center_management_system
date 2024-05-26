@@ -84,51 +84,84 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
+# def get_clients(db: Session, name: Optional[str], page: int, limit: int):
+    # # 基础查询语句，始终包含 GROUP BY
+    # base_query = """
+    # SELECT c.id, c.status, c.name, c.tel, c.age, c.scheduled_date, c.check_in_date, c.hospital_for_childbirth,
+    #        c.contact_name, c.contact_tel, c.meal_plan_id, c.recovery_plan_id, c.mode_of_delivery,
+    #        c.assigned_baby_nurse, c.room, c.due_date, json_agg(b.*) as babies
+    # FROM client c
+    # LEFT JOIN baby b ON c.id = b.client_id
+    # """
+    #
+    # # 构建 WHERE 子句和完整的查询
+    # if name:
+    #     where_clause = "WHERE c.name ILIKE :name"
+    #     full_query = f"""
+    #     {base_query}
+    #     {where_clause}
+    #     GROUP BY c.id
+    #     ORDER BY c.id
+    #     OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
+    #     """
+    #     count_query = f"SELECT COUNT(DISTINCT c.id) FROM client c {where_clause}"
+    #     params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit}
+    # else:
+    #     full_query = f"""
+    #     {base_query}
+    #     GROUP BY c.id
+    #     ORDER BY c.id
+    #     OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
+    #     """
+    #     count_query = "SELECT COUNT(DISTINCT c.id) FROM client c"
+    #     params = {'offset': (page - 1) * limit, 'limit': limit}
+    #
+    # try:
+    #     # 执行查询
+    #     clients = db.execute(text(full_query), params).mappings().all()
+    #
+    #     # 计算总数
+    #     total = db.execute(text(count_query), {'name': f'%{name}%'} if name else {}).scalar()
+    #
+    #     return total, clients
+    # except Exception as e:
+    #     print(f"Error fetching clients: {e}")
+    #     return 0, []
+
 def get_clients(db: Session, name: Optional[str], page: int, limit: int):
-    # 基础查询语句，始终包含 GROUP BY
+    # 使用 COALESCE 函数确保 babies 字段至少为空数组
     base_query = """
     SELECT c.id, c.status, c.name, c.tel, c.age, c.scheduled_date, c.check_in_date, c.hospital_for_childbirth, 
            c.contact_name, c.contact_tel, c.meal_plan_id, c.recovery_plan_id, c.mode_of_delivery, 
-           c.assigned_baby_nurse, c.room, c.due_date, json_agg(b.*) as babies
+           c.assigned_baby_nurse, c.room, c.due_date, 
+           COALESCE(json_agg(b.*) FILTER (WHERE b.baby_id IS NOT NULL), '[]') AS babies
     FROM client c
     LEFT JOIN baby b ON c.id = b.client_id
+    GROUP BY c.id
     """
 
-    # 构建 WHERE 子句和完整的查询
-    if name:
-        where_clause = "WHERE c.name ILIKE :name"
-        full_query = f"""
-        {base_query}
-        {where_clause}
-        GROUP BY c.id
-        ORDER BY c.id
-        OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
-        """
-        count_query = f"SELECT COUNT(DISTINCT c.id) FROM client c {where_clause}"
-        params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit}
-    else:
-        full_query = f"""
-        {base_query}
-        GROUP BY c.id
-        ORDER BY c.id
-        OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
-        """
-        count_query = "SELECT COUNT(DISTINCT c.id) FROM client c"
-        params = {'offset': (page - 1) * limit, 'limit': limit}
+    # 动态构建 WHERE 子句
+    where_clause = "WHERE c.name ILIKE :name" if name else ""
+    count_query = f"SELECT COUNT(DISTINCT c.id) FROM client c {where_clause}"
+
+    # 分页和排序
+    final_query = f"""
+    {base_query}
+    {where_clause}
+    ORDER BY c.id
+    OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
+    """
 
     try:
-        # 执行查询
-        clients = db.execute(text(full_query), params).mappings().all()
-
-        # 计算总数
+        params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit} if name else {
+            'offset': (page - 1) * limit, 'limit': limit}
+        clients = db.execute(text(final_query), params).fetchall()
         total = db.execute(text(count_query), {'name': f'%{name}%'} if name else {}).scalar()
 
         return total, clients
     except Exception as e:
         print(f"Error fetching clients: {e}")
         return 0, []
-
-
 @router.get("/get_clients", response_model=GetAllClientsResp)
 def get_clients_by_name(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db),
                         name: Optional[str] = Query(None), page: int = 1, limit: int = 10):
