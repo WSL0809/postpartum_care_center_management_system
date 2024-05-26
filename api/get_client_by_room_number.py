@@ -1,12 +1,13 @@
+import json
 from typing import Union, List, Dict, Optional
 
 from fastapi import Depends, APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from starlette import status
 
-from auth import get_current_active_user
+from auth import get_current_active_user, roles_required
 from auth_schema import User
 from database import get_db
 from model import Client
@@ -24,13 +25,18 @@ class ClientResp(BaseModel):
     hospital_for_childbirth: str
     contact_name: str
     contact_tel: str
-    babies: List[Baby]
+    babies: List[Baby] = Field(default_factory=list)
     meal_plan_id: int
     recovery_plan_id: Optional[int] = None
     mode_of_delivery: str
     assigned_baby_nurse_name: Union[str, None]
     room: Union[str, None]
 
+    @field_validator('babies', mode='before')
+    def parse_babies(cls, value):
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
 
 class GetClientByRoomResp(BaseModel):
     status: Union[str, int]
@@ -81,30 +87,14 @@ def do_get_client_in_room(db: Session, room_number: str):
 
     """)
     clients = db.execute(query_sql, {"room_number": room_number}).mappings().all()
-    # if len(client) > 1:
-    #     raise HTTPException(status_code=400, detail="Multiple clients found in the same room")
-    return [dict(client) for client in clients]
+    return clients
 
 
-# @router.get("/get_client_in_room", response_model=GetClientByRoomResp)
-# async def get_client_in_room(room_number: str, current_user: User = Depends(get_current_active_user),
-#                              db: Session = Depends(get_db)):
-#     if current_user.role != "admin":
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED
-#         )
-#     client = do_get_client_in_room(db, room_number)
-#     return GetClientByRoomResp(status="success", details="Client fetched successfully.",
-#                                clients=ClientResp(**client))
 @router.get("/get_client_in_room", response_model=GetClientByRoomResp)
+@roles_required("admin")
 async def get_client_in_room(room_number: str, current_user: User = Depends(get_current_active_user),
                              db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
     clients = do_get_client_in_room(db, room_number)
     if clients is None:
         return GetClientByRoomResp(status="error", details="Invalid room number.", clients=[])
-    client_resps = [ClientResp(**client) for client in clients]
-    return GetClientByRoomResp(status="success", details="Client fetched successfully.", clients=client_resps)
+    return GetClientByRoomResp(status="success", details="Client fetched successfully.", clients=clients)
