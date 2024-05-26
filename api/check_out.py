@@ -159,7 +159,8 @@ async def terminate_service(check_out_recv: TerminateRecv, current_user: User = 
 
 @router.post("/check_out")
 @roles_required("admin")
-async def check_out_service(check_out_recv: CheckOutRecv, db: Session = Depends(get_db)):
+async def check_out_service(check_out_recv: CheckOutRecv, current_user: User = Depends(get_current_active_user),
+                            db: Session = Depends(get_db)):
     try:
         client_check_out(db, check_out_recv)
         return CheckOutResp(status=status.HTTP_200_OK, details="退房成功")
