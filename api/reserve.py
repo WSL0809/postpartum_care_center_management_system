@@ -14,7 +14,7 @@ from api.utils import exception_handler
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from config import RoomStatus
+from config import RoomStatus, ClientTag
 
 router = APIRouter()
 occupied = RoomStatus.Occupied.value
@@ -39,6 +39,7 @@ class ReserveRecv(BaseModel):
     meal_plan_seller: Union[Dict, None] = {}
     recovery_plan_seller: Union[Dict, None] = {}
     due_date: Union[str, None] = None
+    status: str
 
     class Config:
         orm_mode = True
@@ -52,10 +53,11 @@ class ReserveResp(BaseModel):
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
     # db_client = model.Client(**reserve_recv.dict())
+    reserve_recv["status"] = f'{reserve_recv["status"]}-{ClientTag.reversed_room}'
     create_client_sql = text(
         """
         INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
-        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, 0, :meal_plan_seller, :recovery_plan_seller, :due_date)
+        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
         RETURNING id
         """
     )
