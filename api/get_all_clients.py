@@ -80,36 +80,45 @@ def clean_input(input_string):
 #     return total, clients_data
 
 
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+
 def get_clients(db: Session, name: Optional[str], page: int, limit: int):
-    # 使用 JOIN 和 JSON 聚合来获取嵌套的 babies 数据
+    # 基础查询语句，始终包含 GROUP BY
     base_query = """
     SELECT c.id, c.status, c.name, c.tel, c.age, c.scheduled_date, c.check_in_date, c.hospital_for_childbirth, 
            c.contact_name, c.contact_tel, c.meal_plan_id, c.recovery_plan_id, c.mode_of_delivery, 
            c.assigned_baby_nurse, c.room, c.due_date, json_agg(b.*) as babies
     FROM client c
     LEFT JOIN baby b ON c.id = b.client_id
-    GROUP BY c.id
     """
 
-    # 过滤条件
-    where_clause = "WHERE c.name ILIKE :name" if name else ""
-    count_query = f"SELECT COUNT(DISTINCT c.id) FROM clients c {where_clause}"
-
-    # 添加分页和过滤
-    final_query = f"""
-    {base_query}
-    {where_clause}
-    ORDER BY c.id
-    OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
-    """
+    # 构建 WHERE 子句和完整的查询
+    if name:
+        where_clause = "WHERE c.name ILIKE :name"
+        full_query = f"""
+        {base_query}
+        {where_clause}
+        GROUP BY c.id
+        ORDER BY c.id
+        OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
+        """
+        count_query = f"SELECT COUNT(DISTINCT c.id) FROM clients c {where_clause}"
+        params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit}
+    else:
+        full_query = f"""
+        {base_query}
+        GROUP BY c.id
+        ORDER BY c.id
+        OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
+        """
+        count_query = "SELECT COUNT(DISTINCT c.id) FROM client c"
+        params = {'offset': (page - 1) * limit, 'limit': limit}
 
     try:
-        # 参数化查询，防止 SQL 注入
-        params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit} if name else {
-            'offset': (page - 1) * limit, 'limit': limit}
-
         # 执行查询
-        clients = db.execute(text(final_query), params).fetchall()
+        clients = db.execute(text(full_query), params).fetchall()
 
         # 计算总数
         total = db.execute(text(count_query), {'name': f'%{name}%'} if name else {}).scalar()
