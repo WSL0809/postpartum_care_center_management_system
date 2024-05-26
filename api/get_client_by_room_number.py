@@ -35,7 +35,7 @@ class ClientResp(BaseModel):
 class GetClientByRoomResp(BaseModel):
     status: Union[str, int]
     details: str
-    clients: ClientResp
+    clients: List[ClientResp]
 
 
 def do_get_client_in_room(db: Session, room_number: str):
@@ -80,12 +80,22 @@ def do_get_client_in_room(db: Session, room_number: str):
         GROUP BY client.id, meal_plan.meal_plan_id, recovery_plan.recovery_plan_id, baby_nurse.baby_nurse_id;
 
     """)
-    client = db.execute(query_sql, {"room_number": room_number}).mappings().all()
-    if len(client) > 1:
-        raise HTTPException(status_code=400, detail="Multiple clients found in the same room")
-    return dict(client[0])
+    clients = db.execute(query_sql, {"room_number": room_number}).mappings().all()
+    # if len(client) > 1:
+    #     raise HTTPException(status_code=400, detail="Multiple clients found in the same room")
+    return [dict(client) for client in clients]
 
 
+# @router.get("/get_client_in_room", response_model=GetClientByRoomResp)
+# async def get_client_in_room(room_number: str, current_user: User = Depends(get_current_active_user),
+#                              db: Session = Depends(get_db)):
+#     if current_user.role != "admin":
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED
+#         )
+#     client = do_get_client_in_room(db, room_number)
+#     return GetClientByRoomResp(status="success", details="Client fetched successfully.",
+#                                clients=ClientResp(**client))
 @router.get("/get_client_in_room", response_model=GetClientByRoomResp)
 async def get_client_in_room(room_number: str, current_user: User = Depends(get_current_active_user),
                              db: Session = Depends(get_db)):
@@ -93,8 +103,8 @@ async def get_client_in_room(room_number: str, current_user: User = Depends(get_
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-    client = do_get_client_in_room(db, room_number)
-    if not client:
-        raise HTTPException(status_code=404, detail="Client not found")
-    return GetClientByRoomResp(status="success", details="Client fetched successfully.",
-                               clients=ClientResp(**client))
+    clients = do_get_client_in_room(db, room_number)
+    if clients is None:
+        return GetClientByRoomResp(status="error", details="Invalid room number.", clients=[])
+    client_resps = [ClientResp(**client) for client in clients]
+    return GetClientByRoomResp(status="success", details="Client fetched successfully.", clients=client_resps)
