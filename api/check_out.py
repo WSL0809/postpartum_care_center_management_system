@@ -38,7 +38,7 @@ class CheckOutRecv(BaseModel):
 
 
 class CheckOutResp(BaseModel):
-    status: str
+    status: Union[str, int]
     details: str
 
 
