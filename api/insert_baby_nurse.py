@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import SQLAlchemyError
@@ -31,7 +31,7 @@ class InsertBabyNurseRecv(BaseModel):
 
 
 class InsertBabyNurseResp(BaseModel):
-    status: str
+    status: Union[str, int]
     details: str
 
 
