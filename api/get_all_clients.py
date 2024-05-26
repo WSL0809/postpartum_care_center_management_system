@@ -104,7 +104,7 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
         ORDER BY c.id
         OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
         """
-        count_query = f"SELECT COUNT(DISTINCT c.id) FROM clients c {where_clause}"
+        count_query = f"SELECT COUNT(DISTINCT c.id) FROM client c {where_clause}"
         params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit}
     else:
         full_query = f"""
