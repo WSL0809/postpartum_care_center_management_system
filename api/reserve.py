@@ -52,8 +52,9 @@ class ReserveResp(BaseModel):
 
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
-    # db_client = model.Client(**reserve_recv.dict())
-    reserve_recv["status"] = f'{reserve_recv["status"]}-{ClientTag.reversed_room}'
+    # 更新状态以反映客户端和房间的变更
+    reserve_recv.status = f'{reserve_recv.status}-{ClientTag.reversed_room}'
+
     create_client_sql = text(
         """
         INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
@@ -61,26 +62,38 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         RETURNING id
         """
     )
+
     update_room_sql = text(
         """
         UPDATE room SET status = :booked, client_id = :client_id WHERE room_number = :room;
         """
     )
-    reserve_recv_dict = dict(reserve_recv)
-    reserve_recv_dict["meal_plan_seller"] = json.dumps(reserve_recv.meal_plan_seller)
-    reserve_recv_dict["recovery_plan_seller"] = json.dumps(reserve_recv.recovery_plan_seller)
+
+    reserve_recv_dict = {
+        "name": reserve_recv.name,
+        "tel": reserve_recv.tel,
+        "age": reserve_recv.age,
+        "scheduled_date": reserve_recv.scheduled_date,
+        "check_in_date": reserve_recv.check_in_date,
+        "hospital_for_childbirth": reserve_recv.hospital_for_childbirth,
+        "contact_name": reserve_recv.contact_name,
+        "contact_tel": reserve_recv.contact_tel,
+        "mode_of_delivery": reserve_recv.mode_of_delivery,
+        "room": reserve_recv.room,
+        "meal_plan_id": reserve_recv.meal_plan_id,
+        "recovery_plan_id": reserve_recv.recovery_plan_id,
+        "assigned_baby_nurse": reserve_recv.assigned_baby_nurse,
+        "id_number": reserve_recv.id_number,
+        "status": reserve_recv.status,
+        "meal_plan_seller": json.dumps(reserve_recv.meal_plan_seller),
+        "recovery_plan_seller": json.dumps(reserve_recv.recovery_plan_seller),
+        "due_date": reserve_recv.due_date,
+    }
+
     try:
-        # 执行创建客户操作
         client_id = db.execute(create_client_sql, reserve_recv_dict).fetchone()[0]
         db.flush()  # 确保客户ID可用
-        # 使用新客户ID更新房间状态
-        db.execute(update_room_sql,
-                   {
-                       "room": reserve_recv.room,
-                       "booked": booked,
-                       "client_id": client_id
-                   }
-                   )
+        db.execute(update_room_sql, {"room": reserve_recv.room, "booked": booked, "client_id": client_id})
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()
