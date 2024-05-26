@@ -53,7 +53,7 @@ class ReserveResp(BaseModel):
 @exception_handler
 def update_client_and_room(db, reserve_recv: ReserveRecv):
     # 更新状态以反映客户端和房间的变更
-    reserve_recv.status = f'{reserve_recv.status}-{ClientTag.reversed_room}'
+    reserve_recv.status = f'{reserve_recv.status}-{ClientTag.reversed_room.value}'
 
     create_client_sql = text(
         """
