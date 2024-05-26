@@ -94,7 +94,6 @@ def update_room_and_client(db, check_out_recv):
 
 
 def client_check_out(db, check_out_recv):
-    # 把房间状态改为空闲，房间客户改为空，最近使用改为今天
     update_room_sql = text(
         """
         UPDATE room SET status = :status, client_id = NULL, recently_used = :recently_used
@@ -162,7 +161,7 @@ async def terminate_service(check_out_recv: TerminateRecv, current_user: User = 
 @roles_required("admin")
 async def check_out_service(check_out_recv: CheckOutRecv, db: Session = Depends(get_db)):
     try:
-        update_room_and_client(db, check_out_recv)
+        client_check_out(db, check_out_recv)
         return CheckOutResp(status=status.HTTP_200_OK, details="退房成功")
     except Exception as e:
         return CheckOutResp(status=status.HTTP_500_INTERNAL_SERVER_ERROR, details=str(e))
