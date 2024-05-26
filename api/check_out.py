@@ -56,9 +56,13 @@ def update_room_and_client(db, check_out_recv):
         SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
     )
-    client_status = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
-    client_status = client_status.mappings().first()
-    client_status = client_status["status"].split("-")[0]
+    result = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
+    client_result = result.mappings().first()
+
+    if client_result is None:
+        raise ValueError("没有找到指定房间的客户信息。")
+
+    client_status = client_result["status"].split("-")[0]
     # 把客户状态改为已离店，客户房间改为空
     update_client_sql = text(
         """
@@ -106,9 +110,13 @@ def client_check_out(db, check_out_recv):
         SELECT status FROM client WHERE id = (SELECT client_id FROM room WHERE room_number = :room_number)
         """
     )
-    client_status = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
-    client_status = client_status.mappings().first()
-    client_status = client_status["status"].split("-")[0]
+    result = db.execute(get_client_status_sql, {"room_number": check_out_recv.room_number})
+    client_result = result.mappings().first()
+
+    if client_result is None:
+        raise ValueError("没有找到指定房间的客户信息。")
+
+    client_status = client_result["status"].split("-")[0]
     # 把客户状态改为已离店，客户房间改为空
     update_client_sql = text(
         """
