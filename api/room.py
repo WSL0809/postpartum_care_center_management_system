@@ -15,7 +15,7 @@ router = APIRouter()
 
 class AddRoomRecv(BaseModel):
     room_number: str
-    notes: Union[str, None]
+    notes: Union[str, None] = None
 
 
 class DeleteRoomRecv(BaseModel):

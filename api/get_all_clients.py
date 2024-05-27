@@ -137,7 +137,6 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
            COALESCE(json_agg(b.*) FILTER (WHERE b.baby_id IS NOT NULL), '[]') AS babies
     FROM client c
     LEFT JOIN baby b ON c.id = b.client_id
-    GROUP BY c.id
     """
 
     # 动态构建 WHERE 子句
@@ -148,6 +147,7 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     final_query = f"""
     {base_query}
     {where_clause}
+    GROUP BY c.id
     ORDER BY c.id
     OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
     """
@@ -156,7 +156,8 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
         params = {'name': f'%{name}%', 'offset': (page - 1) * limit, 'limit': limit} if name else {
             'offset': (page - 1) * limit, 'limit': limit}
         clients = db.execute(text(final_query), params).fetchall()
-        total = db.execute(text(count_query), {'name': f'%{name}%'} if name else {}).scalar()
+        total_params = {'name': f'%{name}%'} if name else {}
+        total = db.execute(text(count_query), total_params).scalar()
 
         return total, clients
     except Exception as e:
