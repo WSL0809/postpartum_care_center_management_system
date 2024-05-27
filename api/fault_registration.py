@@ -25,7 +25,7 @@ class FaultRegistrationRecv(BaseModel):
 
 
 class FaultRegistrationResp(BaseModel):
-    status: str
+    status: Union[str, int]
     details: Union[str, None]
 
 

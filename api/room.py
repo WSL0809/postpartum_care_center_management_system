@@ -17,8 +17,10 @@ class AddRoomRecv(BaseModel):
     room_number: str
     notes: Union[str, None]
 
+
 class DeleteRoomRecv(BaseModel):
     room_number: str
+
 
 class AddRoomResp(BaseModel):
     msg: str
@@ -27,7 +29,8 @@ class AddRoomResp(BaseModel):
 
 @router.post("/add_room", response_model=AddRoomResp)
 @roles_required("admin")
-async def add_room(room_info: AddRoomRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+async def add_room(room_info: AddRoomRecv, current_user: User = Depends(get_current_active_user),
+                   db: Session = Depends(get_db)):
     try:
         room = Room(room_number=room_info.room_number, notes=room_info.notes)
         db.add(room)
