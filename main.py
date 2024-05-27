@@ -24,7 +24,10 @@ from api import (change_room_router, reserve_router, get_all_rooms_router, check
                  room_router)
 from fastapi.middleware.cors import CORSMiddleware
 
-model.Base.metadata.create_all(bind=engine)
+with engine.connect() as conn:
+    conn.execute("SELECT pg_advisory_lock(123456);")
+    model.Base.metadata.create_all(bind=engine)
+    conn.execute("SELECT pg_advisory_unlock(123456);")
 SHOW_DOCS = os.getenv("SHOW_DOCS", "false").lower() == "true"
 app = FastAPI(docs_url="/docs" if SHOW_DOCS else None)
 app.include_router(change_room_router)
