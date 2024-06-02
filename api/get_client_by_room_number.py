@@ -31,6 +31,7 @@ class ClientResp(BaseModel):
     mode_of_delivery: str
     assigned_baby_nurse_name: Union[str, None]
     room: Union[str, None]
+    transaction_price: Union[float, None]
 
     @field_validator('babies', mode='before')
     def parse_babies(cls, value):
@@ -57,6 +58,7 @@ def do_get_client_in_room(db: Session, room_number: str):
         client.hospital_for_childbirth, 
         client.contact_name, 
         client.contact_tel, 
+        client.transaction_price AS transaction_price,
         meal_plan.meal_plan_id AS meal_plan_id, 
         recovery_plan.recovery_plan_id AS recovery_plan_id, 
         mode_of_delivery, 

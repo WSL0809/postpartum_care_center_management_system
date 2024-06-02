@@ -28,6 +28,7 @@ class Client(Base):
     recovery_plan_seller = Column(JSONB)
     due_date = Column(String(255))
     babies = relationship("Baby", back_populates="client")
+    transaction_price = Column(DECIMAL(10, 2))
 
 
 class Baby(Base):

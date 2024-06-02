@@ -40,6 +40,7 @@ class ReserveRecv(BaseModel):
     recovery_plan_seller: Union[Dict, None] = {}
     due_date: Union[str, None] = None
     status: str
+    transaction_price: Union[float, None]
 
     class Config:
         orm_mode = True
@@ -57,8 +58,8 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
 
     create_client_sql = text(
         """
-        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
-        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
+        INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date, transaction_price)
+        VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date, :transaction_price)
         RETURNING id
         """
     )
@@ -88,6 +89,7 @@ def update_client_and_room(db, reserve_recv: ReserveRecv):
         "meal_plan_seller": json.dumps(reserve_recv.meal_plan_seller),
         "recovery_plan_seller": json.dumps(reserve_recv.recovery_plan_seller),
         "due_date": reserve_recv.due_date,
+        "transaction_price": reserve_recv.transaction_price
     }
 
     try:

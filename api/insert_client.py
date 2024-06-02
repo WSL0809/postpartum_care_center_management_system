@@ -37,13 +37,13 @@ class InsertClientRecv(BaseModel):
     recovery_plan_seller: Union[Dict, None] = {}
     due_date: Union[str, None] = None
     status: str
+    transaction_price: Union[float, None]
+
     class Config:
         orm_mode = True
 
 
 def update_client_and_room(db, insert_client_recv: InsertClientRecv):
-
-
     reserve_recv_dict = dict(insert_client_recv)
     reserve_recv_dict["meal_plan_seller"] = json.dumps(insert_client_recv.meal_plan_seller)
     reserve_recv_dict["recovery_plan_seller"] = json.dumps(insert_client_recv.recovery_plan_seller)
@@ -52,8 +52,8 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
         try:
             create_client_sql = text(
                 """
-                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
-                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
+                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, room, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date, transaction_price)
+                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :room, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date, :transaction_price)
                 """
             )
             db.execute(create_client_sql, reserve_recv_dict)
@@ -66,8 +66,8 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
         try:
             create_client_sql_without_room = text(
                 """
-                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date)
-                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date)
+                INSERT INTO client (name, tel, age, scheduled_date, check_in_date, hospital_for_childbirth, contact_name, contact_tel, mode_of_delivery, meal_plan_id, recovery_plan_id, assigned_baby_nurse, id_number, status, meal_plan_seller, recovery_plan_seller, due_date, transaction_price)
+                VALUES (:name, :tel, :age, :scheduled_date, :check_in_date, :hospital_for_childbirth, :contact_name, :contact_tel, :mode_of_delivery, :meal_plan_id, :recovery_plan_id, :assigned_baby_nurse, :id_number, :status, :meal_plan_seller, :recovery_plan_seller, :due_date, :transaction_price)
                 """
             )
             db.execute(create_client_sql_without_room, reserve_recv_dict)
@@ -76,6 +76,7 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
         except SQLAlchemyError as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=f"ERROR: {e}")
+
 
 @router.post("/insert_client")
 async def insert_client(insert_client_recv: InsertClientRecv, current_user: User = Depends(get_current_active_user),

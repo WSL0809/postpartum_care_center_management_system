@@ -1,17 +1,14 @@
-from typing import Optional, Union, Dict
+from typing import Union, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
-from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 from starlette import status
 
 from auth import get_current_active_user
 from auth_schema import User
 from database import get_db
-from model import Room, Client
-from model.client import BabyNurse
 
 router = APIRouter()
 
@@ -35,6 +32,8 @@ class GetAllRoomsResp(BaseModel):
     scheduled_date: Union[str, None]
     check_in_date: Union[str, None]
     due_date: Union[str, None]
+    transaction_price: Union[float, None]
+
 
 @router.get("/get_all_rooms")
 def get_all_room_info(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
@@ -48,6 +47,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
            client.scheduled_date AS scheduled_date,
            client.check_in_date AS check_in_date,
            client.due_date AS due_date,
+           client.transaction_price AS transaction_price,
            baby_nurse.name AS baby_nurse_name,
            meal_plan.details AS meal_plan_details,
            meal_plan.duration AS meal_plan_duration,
