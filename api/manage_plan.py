@@ -14,6 +14,7 @@ from database import get_db
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 class PlanRecvBase(BaseModel):
     id: int
     name: str
@@ -70,7 +71,11 @@ def create_plan_in_db(db, plan_create):
 
 def delete_plan_in_db(db, plan_del):
     delete_plan_sql = ''
+    query_client_meal_plan = ''
     if plan_del.plan_category == "meal_plan":
+        query_client_meal_plan = text(
+            "SELECT id, name FROM client WHERE meal_plan_id = :id"
+        )
         delete_plan_sql = text(
             "DELETE FROM meal_plan WHERE meal_plan_id = :id"
         )
@@ -82,6 +87,9 @@ def delete_plan_in_db(db, plan_del):
     plan_info = dict(plan_del).copy()
     plan_info.pop("plan_category", None)
     try:
+        client_with_meal_plan = db.execute(query_client_meal_plan, plan_info).mappings().all()
+        if client_with_meal_plan:
+            raise HTTPException(status_code=400, detail="套餐正被使用")
         db.execute(delete_plan_sql, plan_info)
         db.commit()
     except IntegrityError as e:
@@ -143,12 +151,14 @@ async def delete_plan(plan_del: PlanDel, current_user: User = Depends(get_curren
                       db: Session = Depends(get_db)):
     if current_user.role != "admin":
         raise HTTPException(status_code=401, detail="only admin can delete plan")
-    delete_plan_in_db(db, plan_del)
-
-    return {
-        "status": "success",
-        "details": "delete plan success"
-    }
+    try:
+        delete_plan_in_db(db, plan_del)
+        return {
+            "status": "success",
+            "details": "delete plan success"
+        }
+    except HTTPException as e:
+        return {"status": "failed", "details": str(e)}
 
 
 @router.get("/get_plans", response_model=PlanResp)

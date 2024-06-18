@@ -1,7 +1,7 @@
 services:
   web:
-    image: registry.cn-shanghai.aliyuncs.com/myyz/yuezisaas:0.1beta
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "20245", "--workers", "4"]
+    image: registry.cn-shanghai.aliyuncs.com/myyz/yuezisaas:0.2beta
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "20245", "--workers", "4", "--log-config", "log_config.yaml"]
     ports:
       - "20245:20245"
     depends_on:
