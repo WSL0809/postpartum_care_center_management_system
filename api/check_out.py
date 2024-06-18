@@ -81,12 +81,13 @@ def update_room_and_client(db, check_out_recv):
     )
 
     try:
+        db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
+
         db.execute(update_client_sql, {"status": f'{client_status}-{ClientTag.terminate.value}',
                                        "room_number": check_out_recv.room_number})
         db.execute(update_room_sql,
                    {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
                     "status": free})
-        db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
         db.commit()
     except ValueError as ve:
         # 如果没有找到对应的client_id，可以在这里处理异常
@@ -116,7 +117,10 @@ def client_check_out(db, check_out_recv):
     if client_result is None:
         raise ValueError("没有找到指定房间的客户信息。")
 
-    client_status = client_result["status"].split("-")[0]
+    try:
+        client_status = client_result["status"].split("-")[0]
+    except IndexError:
+        raise ValueError("获取客户状态失败。")
     # 把客户状态改为已离店，客户房间改为空
     update_client_sql = text(
         """
@@ -135,12 +139,13 @@ def client_check_out(db, check_out_recv):
     )
 
     try:
+        db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
+
         db.execute(update_client_sql, {"status": f'{client_status}-{ClientTag.checked_out.value}',
                                        "room_number": check_out_recv.room_number})
         db.execute(update_room_sql,
                    {"room_number": check_out_recv.room_number, "recently_used": datetime.now().strftime('%Y-%m-%d'),
                     "status": free})
-        db.execute(update_baby_nurse_work_status_sql, {"room_number": check_out_recv.room_number, "standby": standby})
         db.commit()
     except ValueError as ve:
         # 如果没有找到对应的client_id，可以在这里处理异常
