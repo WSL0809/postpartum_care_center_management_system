@@ -37,6 +37,7 @@ class ClientGet(BaseModel):
     room: Union[str, None]
     due_date: Union[str, None]
     transaction_price: Union[float, None]
+    id_number: Union[str, None]
 
 
 class GetAllClientsResp(BaseModel):
