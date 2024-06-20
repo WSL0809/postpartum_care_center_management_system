@@ -14,6 +14,7 @@ router = APIRouter()
 
 
 class GetAllRoomsResp(BaseModel):
+    client_id: Union[int, None]
     room_number: str
     name: Union[str, None]
     baby_nurse_name: Union[str, None]
