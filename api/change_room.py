@@ -92,6 +92,7 @@ def get_room_status(db, room_number: str):
 async def change_room(
     change_room_recv: ChangeRoomRecv,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     if (
         get_room_status(db, change_room_recv.old_room_number) == occupied
