@@ -33,7 +33,7 @@ class ChangeRoomResp(BaseModel):
 
 @exception_handler
 def update_client_and_room(
-    db, old_room_number: str, new_room_number: str, client_name: str
+    db, old_room_number: str, new_room_number: str, client_id: int
 ):
     """
     Update the room number for a client in the database.
@@ -54,7 +54,7 @@ def update_client_and_room(
         UPDATE room SET status = :free WHERE room_number = :old_room_number;
         UPDATE room SET client_id = NULL WHERE room_number = :old_room_number;
         UPDATE room SET status = :occupied WHERE room_number = :new_room_number;
-        UPDATE room SET client_id = (SELECT id FROM client WHERE name = :client_name) WHERE room_number = :new_room_number;
+        UPDATE room SET client_id = :client_id WHERE room_number = :new_room_number;
         """
     )
 
@@ -71,7 +71,7 @@ def update_client_and_room(
                 "occupied": occupied,
                 "new_room_number": new_room_number,
                 "old_room_number": old_room_number,
-                "client_name": client_name,
+                "client_id": client_id,
             },
         )
 
@@ -103,7 +103,7 @@ async def change_room(
                 db,
                 change_room_recv.old_room_number,
                 change_room_recv.new_room_number,
-                change_room_recv.client_name,
+                change_room_recv.client_id,
             )
             return ChangeRoomResp(status=status.HTTP_200_OK, details="完成")
         except SQLAlchemyError as e:
