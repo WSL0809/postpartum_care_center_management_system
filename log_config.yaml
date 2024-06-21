@@ -1,13 +1,20 @@
 version: 1
 formatters:
+  default:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
   access:
     "()": uvicorn.logging.AccessFormatter
-    fmt: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
 handlers:
   console:
     class: logging.StreamHandler
+    formatter: default
+    stream: ext://sys.stdout
+  access_console:
+    class: logging.StreamHandler
     formatter: access
     stream: ext://sys.stdout
+
 loggers:
   uvicorn:
     handlers: [console]
@@ -19,5 +26,5 @@ loggers:
     propagate: False
   uvicorn.access:
     level: INFO
-    handlers: [console]
+    handlers: [access_console]
     propagate: False

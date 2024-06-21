@@ -14,6 +14,7 @@ router = APIRouter()
 
 
 class GetAllRoomsResp(BaseModel):
+    client_id: Union[int, None]
     room_number: str
     name: Union[str, None]
     baby_nurse_name: Union[str, None]
@@ -41,6 +42,7 @@ def get_all_room_info(current_user: User = Depends(get_current_active_user), db:
         sql = text(
             """
          SELECT room_number,
+           client.id AS client_id,
            client.name AS name,
            client.meal_plan_seller AS meal_plan_seller,
            client.recovery_plan_seller AS recovery_plan_seller,

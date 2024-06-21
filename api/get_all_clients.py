@@ -37,6 +37,7 @@ class ClientGet(BaseModel):
     room: Union[str, None]
     due_date: Union[str, None]
     transaction_price: Union[float, None]
+    id_number: Union[str, None]
 
 
 class GetAllClientsResp(BaseModel):
@@ -63,7 +64,7 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
     base_query = """
     SELECT c.id, c.status, c.name, c.tel, c.age, c.scheduled_date, c.check_in_date, c.hospital_for_childbirth, 
            c.contact_name, c.contact_tel, c.meal_plan_id, c.recovery_plan_id, c.mode_of_delivery, 
-           c.assigned_baby_nurse, c.room, c.due_date, c.transaction_price, 
+           c.assigned_baby_nurse, c.room, c.due_date, c.transaction_price, c.id_number,
            COALESCE(json_agg(b.*) FILTER (WHERE b.baby_id IS NOT NULL), '[]') AS babies
     FROM client c
     LEFT JOIN baby b ON c.id = b.client_id
