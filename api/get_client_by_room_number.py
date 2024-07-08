@@ -1,17 +1,15 @@
 import json
-from typing import Union, List, Dict, Optional
+from typing import Union, List, Optional
 
-from fastapi import Depends, APIRouter, HTTPException, Query
+from fastapi import Depends, APIRouter
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from starlette import status
 
 from auth import get_current_active_user, roles_required
 from auth_schema import User
 from database import get_db
-from model import Client
-from schema import ClientBase, Baby
+from schema import Baby
 
 router = APIRouter()
 

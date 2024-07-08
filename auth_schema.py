@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Union
+from typing import Dict, Union
 
 
 class UserBase(BaseModel):
@@ -17,6 +17,14 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+class WxUser(BaseModel):
+    id: int
+    username: str
+    user_detail: Dict
+    double_check_password: Union[str, None]
+    
+    class Config:
+        orm_mode = True
 
 class UserCreate(UserBase):
     password: str

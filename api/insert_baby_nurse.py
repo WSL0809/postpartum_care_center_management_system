@@ -36,10 +36,9 @@ class InsertBabyNurseResp(BaseModel):
 
 
 @router.post("/insert_baby_nurse", response_model=InsertBabyNurseResp)
-def insert_baby_nurse(baby_nurse_recv: InsertBabyNurseRecv, current_user: User = Depends(get_current_active_user),
+def insert_baby_nurse(baby_nurse_recv: InsertBabyNurseRecv,
                       db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        return InsertBabyNurseResp(status=status.HTTP_401_UNAUTHORIZED, details="only admin can insert baby_nurse")
+
     baby_nurse = BabyNurse(**dict(baby_nurse_recv))
     try:
         db.add(baby_nurse)

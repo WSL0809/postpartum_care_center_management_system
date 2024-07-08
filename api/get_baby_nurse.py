@@ -4,7 +4,7 @@ from fastapi import Depends, APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from auth import get_current_active_user
+from auth import get_current_active_user, roles_required
 from auth_schema import User
 from database import get_db
 from model import Client
@@ -69,12 +69,11 @@ def get_baby_nurses(db: Session, name: Optional[str], page: int, limit: int):
 
 
 @router.get("/get_baby_nurse", response_model=GetBabyNurseResp)
-def get_clients_by_name(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db),
+@roles_required(1)
+def get_clients_by_name(db: Session = Depends(get_db),
                         name: Optional[str] = Query(None),
                         page: int = 1,
                         limit: int = 10):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="Unauthorized")
 
     total, baby_nurses = get_baby_nurses(db, name, page, limit)
     if not baby_nurses:

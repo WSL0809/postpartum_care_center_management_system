@@ -1,4 +1,8 @@
+import asyncio
+from contextlib import asynccontextmanager
 import os
+from dotenv import load_dotenv
+
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
@@ -6,11 +10,11 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from api.utils import get_qywx_access_token, refresh_access_token
 from schedules import repeat_every
 
 import crud
 import utils
-from schema import ClientBase, ClientCreate
 from auth_schema import UserCreate, User, TokenData
 import model
 from database import engine, SessionLocal
@@ -21,12 +25,26 @@ from api import (change_room_router, reserve_router, get_all_rooms_router, check
                  fault_registration_router, get_baby_nurse_router, insert_baby_nurse_router,
                  reminder_router, get_client_by_room_number_router, product_router, insert_client_router,
                  manage_plan_router, allocate_room_router, get_plan_by_id_router, update_client_status_router,
-                 room_router)
+                 room_router, qy_wechat_callback_router, wechat_work_robot_sender_router)
 from fastapi.middleware.cors import CORSMiddleware
-
 model.Base.metadata.create_all(bind=engine)
 SHOW_DOCS = os.getenv("SHOW_DOCS", "false").lower() == "true"
-app = FastAPI(docs_url="/docs" if SHOW_DOCS else None)
+CORPID = ''
+CORPSECRET = ''
+access_token = ''
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global access_token, CORPID, CORPSECRET
+    load_dotenv()
+    print("Loading .env")
+    res = get_qywx_access_token()
+    print(res)
+    asyncio.create_task(refresh_access_token())
+    print("Starting up")
+    yield
+    print("Shutting down")
+# app = FastAPI(docs_url="/docs" if SHOW_DOCS else None)
+app = FastAPI(docs_url="/docs" if SHOW_DOCS else None, lifespan=lifespan)
 app.include_router(change_room_router)
 app.include_router(reserve_router)
 app.include_router(get_all_rooms_router)
@@ -46,6 +64,9 @@ app.include_router(allocate_room_router)
 app.include_router(get_plan_by_id_router)
 app.include_router(update_client_status_router)
 app.include_router(room_router)
+app.include_router(qy_wechat_callback_router)
+app.include_router(wechat_work_robot_sender_router)
+
 origins = [
     "*"
 ]
@@ -158,7 +179,8 @@ async def hello():
     return {"hello"}
 
 
-@app.on_event("startup")
 @repeat_every(seconds=60*60)
 async def test_hello():
     print('hello')
+    
+    

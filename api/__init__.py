@@ -17,3 +17,5 @@ from .allocate_room import router as allocate_room_router
 from .get_plan_by_id import router as get_plan_by_id_router
 from .update_client import router as update_client_status_router
 from .room import router as room_router
+from .qy_wechat_callback import router as qy_wechat_callback_router
+from .wechat_work_robot_sender import router as wechat_work_robot_sender_router
