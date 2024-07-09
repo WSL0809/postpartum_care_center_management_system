@@ -69,7 +69,6 @@ def get_baby_nurses(db: Session, name: Optional[str], page: int, limit: int):
 
 
 @router.get("/get_baby_nurse", response_model=GetBabyNurseResp)
-@roles_required(1)
 def get_clients_by_name(db: Session = Depends(get_db),
                         name: Optional[str] = Query(None),
                         page: int = 1,

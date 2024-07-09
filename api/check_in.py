@@ -111,12 +111,7 @@ def update_room_and_baby(db, check_in_recv: CheckInRecv):
 
 @router.post("/check_in")
 def check_in_room(check_in_recv: CheckInRecv, current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+
     try:
         update_room_and_baby(db, check_in_recv)
         return CheckInResp(status="success", details="入住成功")

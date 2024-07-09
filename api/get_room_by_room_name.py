@@ -32,13 +32,8 @@ class GetRoomByRoomNameRecv(BaseModel):
 
 
 @router.get("/get_room_by_room_name", response_model=GetRoomByRoomNameResp)
-def get_all_room_info(room_number: str, current_user: User = Depends(get_current_active_user),
+def get_all_room_info(room_number: str,
                       db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You must be an admin to access this information."
-        )
 
     sql = text(
         """

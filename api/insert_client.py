@@ -81,9 +81,6 @@ def update_client_and_room(db, insert_client_recv: InsertClientRecv):
 @router.post("/insert_client")
 async def insert_client(insert_client_recv: InsertClientRecv, current_user: User = Depends(get_current_active_user),
                         db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="only admin can insert client")
-
     update_client_and_room(db, insert_client_recv)
 
     return {

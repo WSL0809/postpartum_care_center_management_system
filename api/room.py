@@ -28,8 +28,7 @@ class AddRoomResp(BaseModel):
 
 
 @router.post("/add_room", response_model=AddRoomResp)
-@roles_required("admin")
-async def add_room(room_info: AddRoomRecv, current_user: User = Depends(get_current_active_user),
+async def add_room(room_info: AddRoomRecv,
                    db: Session = Depends(get_db)):
     try:
         room = Room(room_number=room_info.room_number, notes=room_info.notes)
@@ -45,7 +44,6 @@ async def add_room(room_info: AddRoomRecv, current_user: User = Depends(get_curr
 
 
 @router.post("/delete_room")
-@roles_required("admin")
 async def delete_room(room: DeleteRoomRecv, db: Session = Depends(get_db)):
     try:
         db.query(Room).filter(Room.room_number == room.room_number).delete()

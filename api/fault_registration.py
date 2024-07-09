@@ -47,8 +47,6 @@ def repair_complete(room_number: str, db: Session):
 @router.post("/fault_registration")
 def fault_registration(fault_registration: FaultRegistrationRecv, current_user: User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        return FaultRegistrationResp(status=status.HTTP_401_UNAUTHORIZED, details="权限不足")
 
     if len(fault_registration.fault_list) == 0 or fault_registration.fault_list is None:
         repair_complete(fault_registration.room_number, db)

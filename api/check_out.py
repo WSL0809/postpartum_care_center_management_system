@@ -157,7 +157,6 @@ def client_check_out(db, check_out_recv):
 
 
 @router.post("/terminate")
-@roles_required("admin")
 async def terminate_service(check_out_recv: TerminateRecv, current_user: User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     if current_user.double_check_password != check_out_recv.double_check_password:
@@ -171,7 +170,6 @@ async def terminate_service(check_out_recv: TerminateRecv, current_user: User = 
 
 
 @router.post("/check_out")
-@roles_required("admin")
 async def check_out_service(check_out_recv: CheckOutRecv, current_user: User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     try:

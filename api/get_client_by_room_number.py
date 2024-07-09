@@ -91,8 +91,7 @@ def do_get_client_in_room(db: Session, room_number: str):
 
 
 @router.get("/get_client_in_room", response_model=GetClientByRoomResp)
-@roles_required("admin")
-async def get_client_in_room(room_number: str, current_user: User = Depends(get_current_active_user),
+async def get_client_in_room(room_number: str,
                              db: Session = Depends(get_db)):
     clients = do_get_client_in_room(db, room_number)
     if clients is None:

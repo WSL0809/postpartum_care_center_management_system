@@ -97,10 +97,8 @@ def get_clients(db: Session, name: Optional[str], page: int, limit: int):
 
 
 @router.get("/get_clients", response_model=GetAllClientsResp)
-def get_clients_by_name(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db),
+def get_clients_by_name(db: Session = Depends(get_db),
                         name: Optional[str] = Query(None), page: int = 1, limit: int = 10):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="Unauthorized")
 
     total, clients = get_clients(db, name, page, limit)
     if not clients:

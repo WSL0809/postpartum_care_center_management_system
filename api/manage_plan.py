@@ -129,8 +129,6 @@ def get_plans_in_db(db, plan_category):
 @router.post("/create_plan")
 async def create_plan(plan_create: PlanCreate, current_user: User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="only admin can add new plan")
     create_plan_in_db(db, plan_create)
 
     return {
@@ -147,10 +145,9 @@ async def create_plan(plan_create: PlanCreate, current_user: User = Depends(get_
 
 # delete plan
 @router.post("/delete_plan")
-async def delete_plan(plan_del: PlanDel, current_user: User = Depends(get_current_active_user),
+async def delete_plan(plan_del: PlanDel,
                       db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="only admin can delete plan")
+
     try:
         delete_plan_in_db(db, plan_del)
         return {
@@ -162,9 +159,8 @@ async def delete_plan(plan_del: PlanDel, current_user: User = Depends(get_curren
 
 
 @router.get("/get_plans", response_model=PlanResp)
-async def get_plans(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=401, detail="only admin can get plans")
+async def get_plans(db: Session = Depends(get_db)):
+
     meal_plan_res = get_plans_in_db(db, "meal_plan")
     recovery_plan_res = get_plans_in_db(db, "recovery_plan")
     return PlanResp(meal_plan=meal_plan_res, recovery_plan=recovery_plan_res)

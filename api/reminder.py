@@ -47,13 +47,7 @@ def pick_babies_by_birthday(db: Session):
 
 
 @router.get("/get_reminder", response_model=list[ReminderResp])
-async def get_reminder(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def get_reminder(db: Session = Depends(get_db)):
 
     resp = [ReminderResp(**dict(row), **{"remind_content": "宝妈生日"}) for row in pick_clients_by_birthday(db)]
     resp.extend([ReminderResp(**dict(row), **{"remind_content": "宝宝生日"}) for row in pick_babies_by_birthday(db)])

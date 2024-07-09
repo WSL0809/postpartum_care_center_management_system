@@ -15,12 +15,6 @@ router = APIRouter()
 @router.post("/allocate_room_by_client_id")
 async def allocate_room_by_client_id(client_id: int, room_number: str, current_user: User = Depends(get_current_active_user),
                                       db: Session = Depends(get_db)):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
     client = db.query(Client).filter(Client.id == client_id).first()
     client_status = client.status.split("-")[1]

@@ -16,11 +16,7 @@ class UpdateClientStatusRecv(BaseModel):
 
 
 @router.post("/update_client_status")
-async def update_client_status(recv: UpdateClientStatusRecv, db: Session = Depends(get_db),
-                               current_user: User = Depends(get_current_active_user)):
-    if current_user.role != "admin":
-        return {"status": 401, "details": "only admin can update client status"}
-
+async def update_client_status(recv: UpdateClientStatusRecv, db: Session = Depends(get_db)):
     client = db.query(Client).filter(Client.id == recv.client_id).first()
     if client is None:
         return {"status": 404, "details": "client not found"}
@@ -31,9 +27,7 @@ async def update_client_status(recv: UpdateClientStatusRecv, db: Session = Depen
 
 
 @router.post("/update_client_meal_plan")
-@roles_required("admin")
-async def update_client_meal_plan(recv: UpdateClientStatusRecv, db: Session = Depends(get_db),
-                                  current_user: User = Depends(get_current_active_user)):
+async def update_client_meal_plan(recv: UpdateClientStatusRecv, db: Session = Depends(get_db)):
     client = db.query(Client).filter(Client.id == recv.client_id).first()
     if client is None:
         return {"status": 404, "details": "client not found"}
